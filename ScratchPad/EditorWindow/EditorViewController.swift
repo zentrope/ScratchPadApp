@@ -1,0 +1,44 @@
+//
+//  EditorViewController.swift
+//  ScratchPad
+//
+//  Created by Keith Irwin on 8/22/19.
+//  Copyright © 2019 Zentrope. All rights reserved.
+//
+
+import Cocoa
+
+class EditorViewController: NSViewController {
+
+    private let editor = SPScrollTextView()
+
+    override func loadView() {
+        let view = NSView()
+        editor.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(editor)
+
+        NSLayoutConstraint.activate([
+            editor.topAnchor.constraint(equalTo: view.topAnchor),
+            editor.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            editor.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            editor.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            view.widthAnchor.constraint(greaterThanOrEqualToConstant: 640.0),
+            view.heightAnchor.constraint(greaterThanOrEqualToConstant: 480.0),
+        ])
+
+        self.view = view
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        editor.action = { [weak self] event in
+            self?.dispatchEvent(event)
+        }
+    }
+
+    private func dispatchEvent(_ event: SPScrollTextView.Event) {
+        print(event)
+    }
+}
+
