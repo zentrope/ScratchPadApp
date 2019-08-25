@@ -12,6 +12,18 @@ class EditorViewController: NSViewController {
 
     private let editor = SPScrollTextView()
 
+    private var page: Page
+
+    init(page: Page) {
+        self.page = page
+        super.init(nibName: nil, bundle: nil)
+        editor.attributedString = page.body
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func loadView() {
         let view = NSView()
         editor.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +50,11 @@ class EditorViewController: NSViewController {
     }
 
     private func dispatchEvent(_ event: SPScrollTextView.Event) {
-        print(event)
+        switch event {
+        case let .textDidChange(attributedString):
+            page.update(attributedString)
+            Store.shared.save(page)
+        }
     }
 }
 

@@ -8,44 +8,40 @@
 
 import Cocoa
 
-
-
 class EditorWindowController: NSWindowController {
 
-    // Should be name of doc:windowcontroller
-    static var windows = [EditorWindowController]()
+    private var controller: EditorViewController
+    private var pageName: String
+    private var saveName: NSWindow.FrameAutosaveName
 
-    static func spawn() {
-        let c = EditorWindowController()
-        c.window?.makeKeyAndOrderFront(self)
-        windows.append(c)
-    }
-
-    convenience init() {
+    init(page: Page) {
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
-        self.init(window: window)
-        setupWindow(window: window)
-    }
 
-    private func setupWindow(window: NSWindow) {
-        window.title = "ScratchPad"
+        self.pageName = page.index
+        self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
+        self.controller = EditorViewController(page: page)
+
+        super.init(window: window)
+
+        window.title = page.name
         window.titleVisibility = .visible
-        window.contentViewController = EditorViewController()
+        window.contentViewController = self.controller
         window.isReleasedWhenClosed = false
         window.delegate = self
+        window.setFrameAutosaveName(saveName)
     }
 
-    override func close() {
-        print("close called on window")
-        super.close()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
 extension EditorWindowController: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
-        print("window will close", EditorWindowController.windows.count)
-        EditorWindowController.windows.removeAll(where: { $0 == self })
+        self.window?.saveFrame(usingName: saveName)
+        WindowManager.shared.removeValue(forKey: pageName)
+        print("\(WindowManager.shared.count) windows remaining")
     }
 
 }

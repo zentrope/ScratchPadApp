@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		533FD2F42311FD7400A0020E /* FileManager+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F32311FD7400A0020E /* FileManager+Ext.swift */; };
+		533FD2F62312091F00A0020E /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* Store.swift */; };
+		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
+		538F03622311C95E00B10F88 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F03612311C95E00B10F88 /* Model.swift */; };
 		53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CB2311B36500712A61 /* EditorWindowController.swift */; };
 		53BD45CE2311B4BF00712A61 /* SPTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CD2311B4BF00712A61 /* SPTextView.swift */; };
 		53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53EA43CF230F85C700019BE2 /* AppDelegate.swift */; };
@@ -17,6 +21,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		533FD2F32311FD7400A0020E /* FileManager+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Ext.swift"; sourceTree = "<group>"; };
+		533FD2F52312091F00A0020E /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
+		538F03612311C95E00B10F88 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		53BD45CB2311B36500712A61 /* EditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWindowController.swift; sourceTree = "<group>"; };
 		53BD45CD2311B4BF00712A61 /* SPTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPTextView.swift; sourceTree = "<group>"; };
 		53EA43CC230F85C700019BE2 /* ScratchPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScratchPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,6 +53,8 @@
 			children = (
 				53EA43DD230F86C800019BE2 /* EditorViewController.swift */,
 				53BD45CB2311B36500712A61 /* EditorWindowController.swift */,
+				53EDDFD52311A94500E2FABB /* SPScrollTextView.swift */,
+				53BD45CD2311B4BF00712A61 /* SPTextView.swift */,
 			);
 			path = EditorWindow;
 			sourceTree = "<group>";
@@ -69,9 +79,11 @@
 			isa = PBXGroup;
 			children = (
 				53EA43CF230F85C700019BE2 /* AppDelegate.swift */,
-				53EDDFD72311AA1A00E2FABB /* Components */,
+				533FD2F32311FD7400A0020E /* FileManager+Ext.swift */,
+				538F03612311C95E00B10F88 /* Model.swift */,
+				533FD2F52312091F00A0020E /* Store.swift */,
+				53490C90231253D300016DC2 /* WindowManager.swift */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
-				53EA43E1230F8ABB00019BE2 /* MainWindow */,
 				53EA43DF230F8A7D00019BE2 /* Metadata */,
 			);
 			path = ScratchPad;
@@ -80,28 +92,12 @@
 		53EA43DF230F8A7D00019BE2 /* Metadata */ = {
 			isa = PBXGroup;
 			children = (
+				53EA43D3230F85C800019BE2 /* MainMenu.xib */,
 				53EA43D1230F85C800019BE2 /* Assets.xcassets */,
 				53EA43D6230F85C800019BE2 /* Info.plist */,
 				53EA43D7230F85C800019BE2 /* ScratchPad.entitlements */,
 			);
 			name = Metadata;
-			sourceTree = "<group>";
-		};
-		53EA43E1230F8ABB00019BE2 /* MainWindow */ = {
-			isa = PBXGroup;
-			children = (
-				53EA43D3230F85C800019BE2 /* MainMenu.xib */,
-			);
-			path = MainWindow;
-			sourceTree = "<group>";
-		};
-		53EDDFD72311AA1A00E2FABB /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				53EDDFD52311A94500E2FABB /* SPScrollTextView.swift */,
-				53BD45CD2311B4BF00712A61 /* SPTextView.swift */,
-			);
-			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -177,7 +173,11 @@
 				53EDDFD62311A94500E2FABB /* SPScrollTextView.swift in Sources */,
 				53BD45CE2311B4BF00712A61 /* SPTextView.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
+				533FD2F62312091F00A0020E /* Store.swift in Sources */,
+				538F03622311C95E00B10F88 /* Model.swift in Sources */,
+				53490C91231253D300016DC2 /* WindowManager.swift in Sources */,
 				53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */,
+				533FD2F42311FD7400A0020E /* FileManager+Ext.swift in Sources */,
 				53EA43DE230F86C800019BE2 /* EditorViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

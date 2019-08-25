@@ -19,6 +19,8 @@ class SPTextView: NSTextView {
         textContainerInset = NSMakeSize(5, 5)
         autoresizingMask = [.width, .height]
         isRichText = true
+        isAutomaticDataDetectionEnabled = true
+        isAutomaticLinkDetectionEnabled = true
+        
     }
-
 }

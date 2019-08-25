@@ -11,32 +11,58 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    @IBOutlet weak var window: NSWindow!
+    private func openMainWindow() {
+        WindowManager.shared.spawn(Store.shared.mainPage())
+    }
 
-    //var testEditor: EditorWindowController?
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        let manager = NSAppleEventManager.shared()
+        manager.setEventHandler(self,
+                                andSelector: #selector(handle(_:withReplyEvent:)),
+                                forEventClass:AEEventClass(kInternetEventClass),
+                                andEventID: AEEventID(kAEGetURL))
+    }
+
+    @objc func handle(_ event: NSAppleEventDescriptor, withReplyEvent: NSAppleEventDescriptor) {
+        guard let urlStr = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else { return }
+        guard let link = urlStr.removingPercentEncoding else { return }
+        if WindowManager.shared.isScratchPadLink(link: link) {
+            WindowManager.shared.open(link: link)
+        }
+    }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        print("app did finish launching")
-        window.contentViewController = EditorViewController()
-
-        EditorWindowController.spawn()
+        openMainWindow()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-        print("app will terminate")
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        // This will make the main window appear if it has been closed
+        // and the user clicks the app icon, or ⌘-Tabs to the app.
+
+        func noVisibleWindows() -> Bool {
+            for w in NSApp.windows {
+                if w.isVisible {
+                    return false
+                }
+            }
+            return true
+        }
+
+        if noVisibleWindows() {
+            openMainWindow()
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         // When the user clicks on the app-icon and there's no window, open a window.
-        print("app should handle reopen")
 
         if !flag {
-            EditorWindowController.spawn()
+            openMainWindow()
         }
         return true
     }
-
 }
 
