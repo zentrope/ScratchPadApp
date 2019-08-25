@@ -67,7 +67,7 @@ extension SPScrollTextView: NSTextViewDelegate {
         }
     }
 
-    var connectMenu: NSMenuItem {
+    private var connectMenu: NSMenuItem {
         let item = NSMenuItem()
         item.title = "Connect"
         item.tag = 666
@@ -76,7 +76,7 @@ extension SPScrollTextView: NSTextViewDelegate {
         return item
     }
 
-    var connectSep: NSMenuItem {
+    private var connectSep: NSMenuItem {
         let sep = NSMenuItem.separator()
         sep.tag = 667
         return sep
@@ -116,21 +116,14 @@ extension SPScrollTextView: NSTextViewDelegate {
 
     func render() {
         guard let source = textView.textStorage else { return }
+
+        // TODO: This will remove legit http links, too. Hm.
+        // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
         source.removeAttribute(.link, range: NSMakeRange(0, source.length))
-        let text = textView.string
-        let names = Store.shared.names
-        for title in names {
+        for title in Store.shared.names {
             let link = WindowManager.shared.makeLink(title)
             do {
-                let pattern = #"\b\#(title)\b"#
-                let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators, .caseInsensitive])
-
-                let matches = regex.matches(in: text, options: [], range: NSMakeRange(0, source.length))
-
-                matches.forEach { m in
-                    source.removeAttribute(.link, range: m.range)
-                    source.addAttribute(.link, value: "\(link)", range: m.range)
-                }
+                try source.addLink(word: title, link: link)
             }
 
             catch {
@@ -143,4 +136,19 @@ extension SPScrollTextView: NSTextViewDelegate {
         render()
         action?(.textDidChange(textView.attributedString()))
     }
+}
+
+extension NSMutableAttributedString {
+
+    func addLink(word: String, link: String) throws {
+        let pattern = #"\b\#(word)\b"#
+        let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators, .caseInsensitive])
+
+        let matches = regex.matches(in: self.string, options: [], range: NSMakeRange(0, self.length))
+
+        matches.forEach { m in
+            self.addAttribute(.link, value: "\(link)", range: m.range)
+        }
+    }
+
 }

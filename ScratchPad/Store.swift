@@ -39,10 +39,15 @@ class Store {
         self[page.name] = page
     }
 
+    let standardAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 16.0),
+        .foregroundColor: NSColor.controlTextColor
+    ]
+
     private func newPage(_ name: String) -> Page {
         let index = name.lowercased()
         let message = index == mainArticle.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
-        let body = NSAttributedString(string: message, attributes: [.font: NSFont.systemFont(ofSize: 16.0)])
+        let body = NSAttributedString(string: message, attributes: standardAttributes)
         let page = Page(name: name, body: body)
         pages[index] = page
         return page
