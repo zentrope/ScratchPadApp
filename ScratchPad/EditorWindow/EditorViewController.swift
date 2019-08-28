@@ -49,11 +49,15 @@ class EditorViewController: NSViewController {
         }
     }
 
+    func save() {
+        Store.shared.save(page)
+    }
+
     private func dispatchEvent(_ event: SPScrollTextView.Event) {
         switch event {
         case let .textDidChange(attributedString):
             page.update(attributedString)
-            Store.shared.save(page)
+            //Store.shared.save(page)
         }
     }
 }

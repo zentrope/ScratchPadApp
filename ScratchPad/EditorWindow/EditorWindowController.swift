@@ -38,10 +38,19 @@ class EditorWindowController: NSWindowController {
 
 extension EditorWindowController: NSWindowDelegate {
 
+    func windowDidBecomeMain(_ notification: Notification) {
+        print("\(pageName) window became main window")
+    }
+
+    func windowDidResignKey(_ notification: Notification) {
+        print("\(pageName) window resigned key window position")
+        controller.save()
+    }
+
     func windowWillClose(_ notification: Notification) {
+        controller.save()
         self.window?.saveFrame(usingName: saveName)
         WindowManager.shared.removeValue(forKey: pageName)
         print("\(WindowManager.shared.count) windows remaining")
     }
-
 }

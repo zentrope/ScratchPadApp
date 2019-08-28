@@ -15,14 +15,6 @@ struct Page {
     var dateCreated: Date
     var dateUpdated: Date
 
-    var index: String {
-        get { return name.lowercased() }
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case uuid, name, body, dateCreated, dateUpdated
-    }
-
     init(name: String, body: NSAttributedString) {
         self.uuid = UUID()
         self.name = name
@@ -31,32 +23,32 @@ struct Page {
         self.dateUpdated = Date()
     }
 
+    init(uuid: UUID, name: String, body: NSAttributedString, dateCreated: Date, dateUpdated: Date) {
+        self.uuid = uuid
+        self.name = name
+        self.body = body
+        self.dateCreated = dateCreated
+        self.dateUpdated = dateUpdated
+    }
+
     mutating func update(_ body: NSAttributedString) {
         self.body = body
         self.dateUpdated = Date()
     }
-}
 
-extension Page: Decodable {
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        uuid = try values.decode(UUID.self, forKey: .uuid)
-        name = try values.decode(String.self, forKey: .name)
-        let _data = try values.decode(Data.self, forKey: .body)
-        body = NSAttributedString(rtf: _data, documentAttributes: nil)!
-        dateCreated = try values.decode(Date.self, forKey: .dateCreated)
-        dateUpdated = try values.decode(Date.self, forKey: .dateUpdated)
+    var index: String {
+        get { return name.lowercased() }
     }
-}
 
-extension Page: Encodable {
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(uuid, forKey: .uuid)
-        try container.encode(name, forKey: .name)
-        let _data = try body.data(from: NSMakeRange(0, body.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])
-        try container.encode(_data, forKey: .body)
-        try container.encode(dateCreated, forKey: .dateCreated)
-        try container.encode(dateUpdated, forKey: .dateUpdated)
+    var bodyData: Data? {
+        get {
+            do {
+                return try body.data(from: NSMakeRange(0, body.length), documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf])
+            }
+            catch {
+                print("Attributed String to Data Error: \(error)")
+                return nil
+            }
+        }
     }
 }
