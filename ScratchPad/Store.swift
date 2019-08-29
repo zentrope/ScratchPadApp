@@ -58,6 +58,11 @@ class Store {
 
 // MARK: - Cloud Functions
 
+// I should make a protocol for storage backend so that tests
+// can implement it. Tests could check for cache stuff or diff
+// checking and so on. Is there enough to test if CloudKit is
+// out of the picture?
+
 extension Store {
 
     // https://stackoverflow.com/q/40847040
@@ -66,13 +71,6 @@ extension Store {
 
         let db = CKContainer.default().privateCloudDatabase
         let predicate = NSPredicate(value: true)
-
-        // Fixme: Doesn't seem to be a way to set the recordName index.
-
-//        <CKError 0x600000c79dd0: "Invalid Arguments" (12/2015);
-//                 server message = "Field 'recordName' is not marked queryable";
-//                 uuid = 6DF6BC6D-D3A3-4BAD-A209-57C4B0F4B919;
-//                 container ID = "iCloud.com.zentrope.ScratchPad">
 
         let query = CKQuery(recordType: "Article", predicate: predicate)
 

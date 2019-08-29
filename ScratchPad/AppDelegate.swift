@@ -8,6 +8,9 @@
 
 import Cocoa
 
+// https://stackoverflow.com/questions/38613606/run-mac-app-with-cloudkit-connected-to-the-production-environment
+// https://apple.co/2NGzsnV (CloudKit Quick Start)
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
