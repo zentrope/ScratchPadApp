@@ -15,6 +15,9 @@ class Store {
 
     private let mainArticle = "Main"
 
+    // Serialize attempts to update (in case we update the same object twice).
+    private let updateQueue = DispatchQueue(label: "cloudkit.update.com.zentrope.ScratchPad")
+
     var names = [String]()
 
     func mainPage() -> Page {
@@ -31,7 +34,9 @@ class Store {
     }
 
     func save(_ page: Page) {
-        DispatchQueue.global().async {
+        // The problem here is that ALL updates are serialized, even if they
+        // can be applied in parallel. Maybe it doesn't matter for this app.
+        updateQueue.async {
             self.updateInCloud(page)
         }
     }
