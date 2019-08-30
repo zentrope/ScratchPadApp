@@ -124,14 +124,14 @@ extension Store {
     }
 
     private func createInCloud(_ page: Page) {
-        guard let body = page.bodyData else {
-            print("Unable to turn text into data")
+        guard let body = page.bodyString else {
+            print("Unable to turn text into string")
             return
         }
 
         let db = CKContainer.default().privateCloudDatabase
 
-        let id = CKRecord.ID(recordName: page.index)
+        let id = CKRecord.ID(recordName: page.index, zoneID: Constants.zoneID)
         let type = "Article"
         let article = CKRecord(recordType: type, recordID: id)
 
@@ -154,7 +154,7 @@ extension Store {
     }
 
     private func updateInCloud(_ page: Page) {
-        guard let body = page.bodyData else {
+        guard let body = page.bodyString else {
             print("ERROR (update): unable to convert text to data")
             return
         }
@@ -189,8 +189,13 @@ extension Store {
             return nil
         }
 
-        guard let data = article["body"] as? Data else {
+        guard let rtfString = article["body"] as? String else {
             print("ERROR (fetch): unable to convert body to data")
+            return nil
+        }
+
+        guard let data = rtfString.data(using: .utf8) else {
+            print("ERROR (fetch): unable to convert body rtf to data")
             return nil
         }
 
@@ -211,7 +216,7 @@ extension Store {
 
         let db = CKContainer.default().privateCloudDatabase
 
-        let id = CKRecord.ID(recordName: index)
+        let id = CKRecord.ID(recordName: index, zoneID: Constants.zoneID)
         let type = "Article"
 
         let semaphore = DispatchSemaphore(value: 0)

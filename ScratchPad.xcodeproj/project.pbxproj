@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		533FD2F62312091F00A0020E /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* Store.swift */; };
 		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
+		537B11102318E47F00D49732 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537B110F2318E47F00D49732 /* Preferences.swift */; };
 		538F03622311C95E00B10F88 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F03612311C95E00B10F88 /* Model.swift */; };
 		53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CB2311B36500712A61 /* EditorWindowController.swift */; };
 		53DD107E231633E500D4E98D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53DD107D231633E500D4E98D /* CloudKit.framework */; };
@@ -22,6 +23,7 @@
 /* Begin PBXFileReference section */
 		533FD2F52312091F00A0020E /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
+		537B110F2318E47F00D49732 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		538F03612311C95E00B10F88 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		53BD45CB2311B36500712A61 /* EditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWindowController.swift; sourceTree = "<group>"; };
 		53DD107D231633E500D4E98D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -87,6 +89,7 @@
 			children = (
 				53EA43CF230F85C700019BE2 /* AppDelegate.swift */,
 				538F03612311C95E00B10F88 /* Model.swift */,
+				537B110F2318E47F00D49732 /* Preferences.swift */,
 				533FD2F52312091F00A0020E /* Store.swift */,
 				53490C90231253D300016DC2 /* WindowManager.swift */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
@@ -176,6 +179,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				537B11102318E47F00D49732 /* Preferences.swift in Sources */,
 				53EDDFD62311A94500E2FABB /* EditorTextView.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				533FD2F62312091F00A0020E /* Store.swift in Sources */,

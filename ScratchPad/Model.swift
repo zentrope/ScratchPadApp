@@ -40,6 +40,15 @@ struct Page {
         get { return name.lowercased() }
     }
 
+    var bodyString: String? {
+        get {
+            if let data = bodyData {
+                return String(data: data, encoding: .utf8)
+            }
+            return nil
+        }
+    }
+
     var bodyData: Data? {
         get {
             do {
