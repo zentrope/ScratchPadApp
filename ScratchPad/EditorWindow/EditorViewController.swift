@@ -12,9 +12,9 @@ class EditorViewController: NSViewController {
 
     private let editor = EditorTextView()
 
-    private var page: Page
+    private var page: Article
 
-    init(page: Page) {
+    init(page: Article) {
         self.page = page
         super.init(nibName: nil, bundle: nil)
         editor.attributedString = page.body
@@ -48,7 +48,7 @@ class EditorViewController: NSViewController {
     }
 
     func save() {
-        Store.shared.save(page)
+        Store.shared.update(page)
     }
 
     private func updateText(_ string: NSAttributedString) {

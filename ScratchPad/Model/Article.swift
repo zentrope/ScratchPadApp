@@ -1,5 +1,5 @@
 //
-//  Model.swift
+//  Article.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 8/24/19.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Page {
+struct Article {
     var uuid: UUID
     var name: String
     var body: NSAttributedString

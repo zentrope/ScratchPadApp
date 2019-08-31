@@ -7,10 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		533EFEBA231B3032006F6B4C /* Page+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533EFEB9231B3032006F6B4C /* Page+Extension.swift */; };
 		533FD2F62312091F00A0020E /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* Store.swift */; };
 		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
 		537B11102318E47F00D49732 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537B110F2318E47F00D49732 /* Preferences.swift */; };
-		538F03622311C95E00B10F88 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F03612311C95E00B10F88 /* Model.swift */; };
+		538F03622311C95E00B10F88 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F03612311C95E00B10F88 /* Article.swift */; };
 		539A73F3231A34C1005E2788 /* CloudData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539A73F2231A34C1005E2788 /* CloudData.swift */; };
 		53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CB2311B36500712A61 /* EditorWindowController.swift */; };
 		53DD107E231633E500D4E98D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53DD107D231633E500D4E98D /* CloudKit.framework */; };
@@ -22,10 +23,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		533EFEB9231B3032006F6B4C /* Page+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Page+Extension.swift"; sourceTree = "<group>"; };
 		533FD2F52312091F00A0020E /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
 		537B110F2318E47F00D49732 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
-		538F03612311C95E00B10F88 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		538F03612311C95E00B10F88 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
 		539A73F2231A34C1005E2788 /* CloudData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudData.swift; sourceTree = "<group>"; };
 		53BD45CB2311B36500712A61 /* EditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWindowController.swift; sourceTree = "<group>"; };
 		53DD107D231633E500D4E98D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -51,6 +53,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		533EFEB8231B3005006F6B4C /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				539A73F2231A34C1005E2788 /* CloudData.swift */,
+				533EFEB9231B3032006F6B4C /* Page+Extension.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		533EFEBB231B306B006F6B4C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				538F03612311C95E00B10F88 /* Article.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		53BD45CF2311B60200712A61 /* EditorWindow */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,13 +109,13 @@
 			isa = PBXGroup;
 			children = (
 				53EA43CF230F85C700019BE2 /* AppDelegate.swift */,
-				539A73F2231A34C1005E2788 /* CloudData.swift */,
-				538F03612311C95E00B10F88 /* Model.swift */,
 				537B110F2318E47F00D49732 /* Preferences.swift */,
 				533FD2F52312091F00A0020E /* Store.swift */,
 				53490C90231253D300016DC2 /* WindowManager.swift */,
+				533EFEB8231B3005006F6B4C /* Cloud */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
 				53EA43DF230F8A7D00019BE2 /* Metadata */,
+				533EFEBB231B306B006F6B4C /* Model */,
 			);
 			path = ScratchPad;
 			sourceTree = "<group>";
@@ -187,7 +206,8 @@
 				539A73F3231A34C1005E2788 /* CloudData.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				533FD2F62312091F00A0020E /* Store.swift in Sources */,
-				538F03622311C95E00B10F88 /* Model.swift in Sources */,
+				538F03622311C95E00B10F88 /* Article.swift in Sources */,
+				533EFEBA231B3032006F6B4C /* Page+Extension.swift in Sources */,
 				53490C91231253D300016DC2 /* WindowManager.swift in Sources */,
 				53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */,
 				53EA43DE230F86C800019BE2 /* EditorViewController.swift in Sources */,

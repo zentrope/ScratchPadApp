@@ -8,6 +8,9 @@
 
 import Foundation
 import CloudKit
+import os.log
+
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "CloudData")
 
 // https://apple.co/2NJjCsE
 
@@ -48,6 +51,80 @@ struct CloudData {
         default:
             fatalError("Asked to fetch from scope we don't know about \(databaseScope)")
         }
+    }
+
+    func save(page: Article) {
+        guard let body = page.bodyString else {
+            print("Unable to turn text into string")
+            return
+        }
+
+        let db = CKContainer.default().privateCloudDatabase
+
+        let id = CKRecord.ID(recordName: page.index, zoneID: CloudData.zoneID)
+        let type = "Article"
+        let article = CKRecord(recordType: type, recordID: id)
+
+        article["name"] = page.name
+        article["body"] = body
+        article["uuid"] = page.uuid.uuidString
+        article["dateCreated"] = page.dateCreated
+        article["dateUpdated"] = page.dateUpdated
+
+        db.save(article) { (savedArticle, error) in
+            if let error = error {
+                print("ERROR: \(error)")
+                return
+            }
+
+            if let saved = savedArticle {
+                print("SAVED: \(saved.recordID)")
+            }
+        }
+    }
+
+    func update(page: Article, metadata: Data?) {
+        os_log("%{public}s", log: logger, type: .debug, "Updating '\(page.index)' in cloud.")
+
+        guard let metadata = metadata else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(page.index)'")
+            return
+        }
+
+        guard let body = page.bodyString else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to decode page body string")
+            return
+        }
+
+        guard let coder = try? NSKeyedUnarchiver(forReadingFrom: metadata) else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to create coder from metadata '\(page.index)'")
+            return
+        }
+        coder.requiresSecureCoding = true
+        let record = CKRecord(coder: coder)
+        coder.finishDecoding()
+
+        guard let update = record else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to unpack record.")
+            return
+        }
+
+        update["dateUpdated"] = Date()
+        update["body"] = body
+
+        let op = CKModifyRecordsOperation(recordsToSave: [update], recordIDsToDelete: [])
+        op.savePolicy = .changedKeys
+        op.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedIds, error) in
+            if let error = error {
+                os_log("%{public}s", log: logger, type: .error, "Unable to update '\(page.index)', error: '\(error)'.")
+                return
+            }
+            if let saves = savedRecords {
+                let indexes = saves.map { $0.recordID.recordName }
+                os_log("%{public}s", log: logger, "Updated success for \(indexes)")
+            }
+        }
+        privateDB.add(op)
     }
 
     // MARK: - Private
@@ -118,16 +195,15 @@ struct CloudData {
         // The operation object executes this block once for each record in the zone that changed since the previous fetch request. Each time the block is executed, it is executed serially with respect to the other progress blocks of the operation. If no records changed, the block is not executed.
         op.recordChangedBlock = { record in
             // if record.recordType == "Article"
-            if let page = Page.fromCloud(record) {
-                Store.shared[page.index] = page
-
-//                let coder = NSKeyedArchiver(requiringSecureCoding: true)
-//                record.encodeSystemFields(with: coder)
-//                coder.finishEncoding()
-//                let data = coder.encodedData
+            if let page = Article.fromCloud(record) {
+                // Metadata
+                let coder = NSKeyedArchiver(requiringSecureCoding: true)
+                record.encodeSystemFields(with: coder)
+                coder.finishEncoding()
+                let data = coder.encodedData
+                Store.shared.update(articleId: page.index, page: page, metadata: data)
             }
-
-            print("changed", record)
+            os_log("%{public}s", log: logger, "received update for '\(record.recordID)'")
         }
 
         op.recordWithIDWasDeletedBlock = { recordId, recordType in

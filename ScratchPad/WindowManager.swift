@@ -49,7 +49,7 @@ class WindowManager {
         }
     }
 
-    func spawn(_ page: Page) {
+    func spawn(_ page: Article) {
         let c = EditorWindowController(page: page)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.index] = c

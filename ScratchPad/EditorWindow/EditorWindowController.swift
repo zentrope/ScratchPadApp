@@ -14,7 +14,7 @@ class EditorWindowController: NSWindowController {
     private var pageName: String
     private var saveName: NSWindow.FrameAutosaveName
 
-    init(page: Page) {
+    init(page: Article) {
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
         self.pageName = page.index
