@@ -11,6 +11,7 @@
 		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
 		537B11102318E47F00D49732 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537B110F2318E47F00D49732 /* Preferences.swift */; };
 		538F03622311C95E00B10F88 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F03612311C95E00B10F88 /* Model.swift */; };
+		539A73F3231A34C1005E2788 /* CloudData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539A73F2231A34C1005E2788 /* CloudData.swift */; };
 		53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CB2311B36500712A61 /* EditorWindowController.swift */; };
 		53DD107E231633E500D4E98D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53DD107D231633E500D4E98D /* CloudKit.framework */; };
 		53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53EA43CF230F85C700019BE2 /* AppDelegate.swift */; };
@@ -25,6 +26,7 @@
 		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
 		537B110F2318E47F00D49732 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		538F03612311C95E00B10F88 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		539A73F2231A34C1005E2788 /* CloudData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudData.swift; sourceTree = "<group>"; };
 		53BD45CB2311B36500712A61 /* EditorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWindowController.swift; sourceTree = "<group>"; };
 		53DD107D231633E500D4E98D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		53EA43CC230F85C700019BE2 /* ScratchPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScratchPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				53EA43CF230F85C700019BE2 /* AppDelegate.swift */,
+				539A73F2231A34C1005E2788 /* CloudData.swift */,
 				538F03612311C95E00B10F88 /* Model.swift */,
 				537B110F2318E47F00D49732 /* Preferences.swift */,
 				533FD2F52312091F00A0020E /* Store.swift */,
@@ -181,6 +184,7 @@
 			files = (
 				537B11102318E47F00D49732 /* Preferences.swift in Sources */,
 				53EDDFD62311A94500E2FABB /* EditorTextView.swift in Sources */,
+				539A73F3231A34C1005E2788 /* CloudData.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				533FD2F62312091F00A0020E /* Store.swift in Sources */,
 				538F03622311C95E00B10F88 /* Model.swift in Sources */,

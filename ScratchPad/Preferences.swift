@@ -9,12 +9,6 @@
 import Foundation
 import CloudKit
 
-enum Constants {
-    static let zoneName = "Articles"
-    static let zoneID = CKRecordZone.ID(zoneName: Constants.zoneName, ownerName: CKCurrentUserDefaultName)
-    static let privateSubscriptionID = "private-changes"
-}
-
 struct Preferences {
     // subscribed to private changes -> bool
     // created custom zone -> bool

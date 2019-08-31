@@ -18,24 +18,38 @@ class Store {
     // Serialize attempts to update (in case we update the same object twice).
     private let updateQueue = DispatchQueue(label: "cloudkit.update.com.zentrope.ScratchPad")
 
-    var names = [String]()
+    private var pages = [String:Page]()
+
+
+    var names: [String] {
+        get {
+            return Array(pages.keys)
+        }
+    }
 
     func mainPage() -> Page {
-        names = findNames()
+        print("GETTING MAIN PAGE")
         return self[mainArticle]
     }
 
     subscript(index: String) -> Page {
         get {
-            let page = getInCloud(index.lowercased()) ?? newPage(index)
-            names.append(page.name)
-            return page
+            if let page = pages[index.lowercased()] {
+                return page
+            }
+            let newPage = self.newPage(index)
+            pages[index] = newPage
+            return newPage
+        }
+        set (newPage) {
+            pages[newPage.index.lowercased()] = newPage
         }
     }
 
     func save(_ page: Page) {
         // The problem here is that ALL updates are serialized, even if they
         // can be applied in parallel. Maybe it doesn't matter for this app.
+        pages[page.index] = page
         updateQueue.async {
             self.updateInCloud(page)
         }
@@ -55,73 +69,13 @@ class Store {
         DispatchQueue.global().async {
             self.createInCloud(page)
         }
-
-        names.append(page.name)
         return page
     }
 }
 
 // MARK: - Cloud Functions
 
-// I should make a protocol for storage backend so that tests
-// can implement it. Tests could check for cache stuff or diff
-// checking and so on. Is there enough to test if CloudKit is
-// out of the picture?
-
 extension Store {
-
-    // https://stackoverflow.com/q/40847040
-    private func findNames() -> [String] {
-        var names = [String]()
-
-        let db = CKContainer.default().privateCloudDatabase
-        let predicate = NSPredicate(value: true)
-
-        let query = CKQuery(recordType: "Article", predicate: predicate)
-
-        let lock = DispatchSemaphore(value: 0)
-
-        var op = CKQueryOperation(query: query)
-        op.desiredKeys = ["name"]
-        op.resultsLimit = 1000
-
-        op.recordFetchedBlock = { record in
-            print("find names: record = \(record)")
-            if let name = record["name"] as? String {
-                names.append(name)
-            }
-        }
-
-        op.queryCompletionBlock = { cursor, error in
-            if let error = error {
-                print("ERROR (query): \(error)")
-                lock.signal()
-                return
-            }
-
-            if cursor != nil {
-
-                // Figure this out: how should this actually work?
-                let qNext = CKQueryOperation(cursor: cursor!)
-                qNext.resultsLimit = op.resultsLimit
-                qNext.queryCompletionBlock = op.queryCompletionBlock
-                qNext.desiredKeys = op.desiredKeys
-                qNext.recordFetchedBlock = op.recordFetchedBlock
-                op = qNext
-                db.add(op)
-                return
-            }
-
-            lock.signal()
-        }
-
-        db.add(op)
-
-        lock.wait()
-
-        print("names: \(names)")
-        return names
-    }
 
     private func createInCloud(_ page: Page) {
         guard let body = page.bodyString else {
@@ -131,7 +85,7 @@ extension Store {
 
         let db = CKContainer.default().privateCloudDatabase
 
-        let id = CKRecord.ID(recordName: page.index, zoneID: Constants.zoneID)
+        let id = CKRecord.ID(recordName: page.index, zoneID: CloudData.zoneID)
         let type = "Article"
         let article = CKRecord(recordType: type, recordID: id)
 
@@ -180,43 +134,11 @@ extension Store {
         }
     }
 
-    private func getInCloud(_ index: String) -> Page? {
-        // This is going to be synchronous for a while until I can get some
-        // better logic at the window/editor layer.
-
-        guard let article = getRecord(index) else {
-            print("ERROR (fetch): unable to unwrap article return value")
-            return nil
-        }
-
-        guard let rtfString = article["body"] as? String else {
-            print("ERROR (fetch): unable to convert body to data")
-            return nil
-        }
-
-        guard let data = rtfString.data(using: .utf8) else {
-            print("ERROR (fetch): unable to convert body rtf to data")
-            return nil
-        }
-
-        // Maybe make names enums for string constants?
-        if let name = article["name"] as? String,
-            let uuid = UUID(uuidString: article["uuid"] ?? UUID().uuidString),
-            let dateCreated = article["dateCreated"] as? Date,
-            let dateUpdated = article["dateUpdated"] as? Date,
-            let body = NSAttributedString(rtf: data, documentAttributes: nil) {
-            return Page(uuid: uuid, name: name, body: body, dateCreated: dateCreated, dateUpdated: dateUpdated)
-        }
-
-        print("ERROR (fetch): unable to convert record to page")
-        return nil
-    }
-
     private func getRecord(_ index: String) -> CKRecord? {
 
         let db = CKContainer.default().privateCloudDatabase
 
-        let id = CKRecord.ID(recordName: index, zoneID: Constants.zoneID)
+        let id = CKRecord.ID(recordName: index, zoneID: CloudData.zoneID)
         let type = "Article"
 
         let semaphore = DispatchSemaphore(value: 0)
@@ -242,4 +164,33 @@ extension Store {
         return record
     }
 
+}
+
+extension Page {
+
+    static func fromCloud(_ article: CKRecord) -> Page? {
+
+        guard let rtfString = article["body"] as? String else {
+            print("ERROR (fetch): unable to convert body to data")
+            return nil
+        }
+
+        guard let data = rtfString.data(using: .utf8) else {
+            print("ERROR (fetch): unable to convert body rtf to data")
+            return nil
+        }
+
+        // Maybe make names enums for string constants?
+        if let name = article["name"] as? String,
+            let uuid = UUID(uuidString: article["uuid"] ?? UUID().uuidString),
+            let dateCreated = article["dateCreated"] as? Date,
+            let dateUpdated = article["dateUpdated"] as? Date,
+            let body = NSAttributedString(rtf: data, documentAttributes: nil) {
+            return Page(uuid: uuid, name: name, body: body, dateCreated: dateCreated, dateUpdated: dateUpdated)
+        }
+
+        print("ERROR (fetch): unable to convert record to page")
+        return nil
+
+    }
 }

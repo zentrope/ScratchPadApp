@@ -37,10 +37,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        createArticleZone()
-        createSubscription()
-        NSApp.registerForRemoteNotifications()
-        openMainWindow()
+        CloudData.shared.setup() {
+            NSApp.registerForRemoteNotifications()
+            self.openMainWindow()
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -78,74 +78,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String : Any]) {
+
         print("REMOTE application did receive remote notification", userInfo)
-        
-    }
-}
-
-// MARK: - CloudKit Initialization
-
-extension AppDelegate {
-
-    private func createArticleZone() {
-        if Preferences.isCustomZoneCreated {
-            print("Already created zone: \(Constants.zoneName).")
-            return
+        let dict = userInfo as! [String:NSObject]
+        guard let notification: CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else {
+            return }
+        CloudData.shared.fetchChanges(in: notification.databaseScope) {
+            print("CHANGES WERE FETCHED")
+            NotificationCenter.default.post(name: .cloudDataChanged, object: self)
         }
 
-        let container = CKContainer.default()
-        let privateDB = container.privateCloudDatabase
-
-        let createZoneGroup = DispatchGroup()
-
-        createZoneGroup.enter()
-
-        let customZone = CKRecordZone(zoneID: Constants.zoneID)
-        let createZoneOperation = CKModifyRecordZonesOperation(recordZonesToSave: [customZone], recordZoneIDsToDelete: [])
-        createZoneOperation.modifyRecordZonesCompletionBlock = { saved, deleted, error in
-            defer { createZoneGroup.leave() }
-            if let error = error {
-                print("🔥 ERROR (create zone): \(error)")
-                return
-            }
-            Preferences.isCustomZoneCreated = true
-        }
-
-        createZoneOperation.qualityOfService = .utility
-        privateDB.add(createZoneOperation)
-    }
-
-    private func createSubscription() {
-        if Preferences.isSubscribedToPrivateChanges {
-            print("Already subscribed to private changes.")
-            return
-        }
-
-        let container = CKContainer.default()
-        let privateDB = container.privateCloudDatabase
-
-        let op = makeSubscriptionOp(id: Constants.privateSubscriptionID)
-
-        op.modifySubscriptionsCompletionBlock = { subscriptions, deleteIds, error in
-            if let error = error {
-                print("🔥 ERROR (create sub): \(error)")
-                return
-            }
-            print("Subscription \(Constants.privateSubscriptionID) was successful.")
-        }
-
-        privateDB.add(op)
-    }
-
-    private func makeSubscriptionOp(id: String) -> CKModifySubscriptionsOperation {
-        let sub = CKDatabaseSubscription(subscriptionID: Constants.privateSubscriptionID)
-        let note = CKSubscription.NotificationInfo()
-        note.shouldSendContentAvailable = true
-        sub.notificationInfo = note
-
-        let op = CKModifySubscriptionsOperation(subscriptionsToSave: [sub], subscriptionIDsToDelete: [])
-        op.qualityOfService = .utility
-        return op
     }
 }
 
