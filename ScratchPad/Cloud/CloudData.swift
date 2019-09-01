@@ -34,16 +34,14 @@ struct CloudData {
     }
 
     func setup(_ completion: @escaping () -> Void) {
-
         DispatchQueue.global().async {
             do {
-                os_log("%{public}s", log: logger, "create article zone")
                 try self.createArticleZone()
-                os_log("%{public}s", log: logger, "create subscription")
                 try self.createSubscription()
+
                 self.fetchDatabaseChanges(database: self.privateDB) {
                     DispatchQueue.main.async {
-                        os_log("%{public}s", log: logger, "dispatching completion on fetch database completion")
+                        os_log("%{public}s", log: logger, "Initial database fetch is complete.")
                         completion()
                     }
                 }
@@ -53,8 +51,6 @@ struct CloudData {
                 fatalError("\(error)")
             }
         }
-
-        os_log("%{public}s", log: logger, "setup exit")
     }
 
     func fetchChanges(in databaseScope: CKDatabase.Scope, completion: @escaping () -> Void) {
@@ -141,6 +137,9 @@ struct CloudData {
     }
 
     // MARK: - Private
+
+    // NOTE: an option here might be to make functions that return ops, set
+    // dependencies between them, then add them to the database all at once.
 
     private func fetchDatabaseChanges(database: CKDatabase, completion: @escaping () -> Void) {
 
@@ -254,6 +253,7 @@ struct CloudData {
     // MARK: - Initialization
 
     private func createArticleZone() throws {
+        os_log("%{public}s", log: logger, "Create zone '\(CloudData.zoneName)' if necessary.")
         if Preferences.isCustomZoneCreated {
             os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneName)' already created.")
             return
@@ -284,6 +284,7 @@ struct CloudData {
     }
 
     private func createSubscription() throws {
+        os_log("%{public}s", log: logger, "Subscribe to private database changes if necessary.")
         if Preferences.isSubscribedToPrivateChanges {
             os_log("%{public}s", log: logger, "Already subscribed to private database changes.")
             return
