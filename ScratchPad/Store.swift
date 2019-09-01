@@ -15,6 +15,7 @@ class Store {
     private let mainArticle = "Main"
 
     // Serialize attempts to update (in case we update the same object twice).
+    // Use a timer to periodically update pages.
     private let updateQueue = DispatchQueue(label: "cloudkit.update.com.zentrope.ScratchPad")
 
     // Cache
@@ -29,6 +30,7 @@ class Store {
     }
 
     func mainPage() -> Article {
+
         return self[mainArticle]
     }
 
@@ -62,6 +64,14 @@ class Store {
     }
 
     private func newPage(_ name: String) -> Article {
+        let article = makeArticle(name: name)
+        DispatchQueue.global().async {
+            CloudData.shared.save(page: article)
+        }
+        return article
+    }
+
+    private func makeArticle(name: String) -> Article {
         let attrs: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 16.0),
             .foregroundColor: NSColor.controlTextColor
@@ -69,11 +79,6 @@ class Store {
         let index = name.lowercased()
         let message = index == mainArticle.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
         let body = NSAttributedString(string: message, attributes: attrs)
-        let page = Article(name: name, body: body)
-
-        DispatchQueue.global().async {
-            CloudData.shared.save(page: page)
-        }
-        return page
+        return Article(name: name, body: body)
     }
 }

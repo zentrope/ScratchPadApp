@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import os.log
+
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "WindowManager")
 
 class WindowManager {
 
@@ -43,8 +46,10 @@ class WindowManager {
 
     func open(name: String) {
         if let win = windows[name] {
+            os_log("%{public}s", log: logger, "Making \(name) window key")
             win.window?.makeKeyAndOrderFront(self)
         } else {
+            os_log("%{public}s", log: logger, "Spawning new '\(name)' window")
             spawn(Store.shared[name])
         }
     }

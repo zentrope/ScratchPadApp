@@ -7,6 +7,9 @@
 //
 
 import Cocoa
+import os.log
+
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "EditorWindowController")
 
 class EditorWindowController: NSWindowController {
 
@@ -39,11 +42,11 @@ class EditorWindowController: NSWindowController {
 extension EditorWindowController: NSWindowDelegate {
 
     func windowDidBecomeMain(_ notification: Notification) {
-        print("\(pageName) window became main window")
+        os_log("%{public}s", log: logger, "'\(pageName)' window became key window'")
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        print("\(pageName) window resigned key window position")
+        os_log("%{public}s", log: logger, "'\(pageName)' window resigned key window position")
         controller.save()
     }
 
@@ -51,6 +54,6 @@ extension EditorWindowController: NSWindowDelegate {
         controller.save()
         self.window?.saveFrame(usingName: saveName)
         WindowManager.shared.removeValue(forKey: pageName)
-        print("\(WindowManager.shared.count) windows remaining")
+        os_log("%{public}s", log: logger, "\(WindowManager.shared.count) windows remaining")
     }
 }

@@ -34,14 +34,27 @@ struct CloudData {
     }
 
     func setup(_ completion: @escaping () -> Void) {
-        createArticleZone()
-        createSubscription()
-        fetchDatabaseChanges(database: privateDB) {
-            DispatchQueue.main.async {
-                print("CHECK ON START UP")
-                completion()
+
+        DispatchQueue.global().async {
+            do {
+                os_log("%{public}s", log: logger, "create article zone")
+                try self.createArticleZone()
+                os_log("%{public}s", log: logger, "create subscription")
+                try self.createSubscription()
+                self.fetchDatabaseChanges(database: self.privateDB) {
+                    DispatchQueue.main.async {
+                        os_log("%{public}s", log: logger, "dispatching completion on fetch database completion")
+                        completion()
+                    }
+                }
+            }
+
+            catch {
+                fatalError("\(error)")
             }
         }
+
+        os_log("%{public}s", log: logger, "setup exit")
     }
 
     func fetchChanges(in databaseScope: CKDatabase.Scope, completion: @escaping () -> Void) {
@@ -73,12 +86,12 @@ struct CloudData {
 
         db.save(article) { (savedArticle, error) in
             if let error = error {
-                print("ERROR: \(error)")
+                os_log("%{public}s", log: logger, type: .error, "\(error)")
                 return
             }
 
             if let saved = savedArticle {
-                print("SAVED: \(saved.recordID)")
+                os_log("%{public}s", log: logger, "Saved '\(saved.recordID.recordName)' to iCloud.")
             }
         }
     }
@@ -155,13 +168,12 @@ struct CloudData {
         op.fetchDatabaseChangesCompletionBlock = { token, moreComing, error in
             if let error = error {
                 // Should set an alert
-                print("ERROR: fetch database changed \(error)")
+                os_log("%{public}s", log: logger, type: .error, "\(error)")
                 completion()
                 return
             }
 
-            print("completion token: \(String(describing: token))")
-            print("moreComing = \(moreComing)")
+            os_log("%{public}s", log: logger, "database change token \(String(describing: token))")
 
             // If the Articles zone is deleted, mark it uncreated in
             // preferences? Then what? Recreated it?
@@ -195,15 +207,15 @@ struct CloudData {
         // The operation object executes this block once for each record in the zone that changed since the previous fetch request. Each time the block is executed, it is executed serially with respect to the other progress blocks of the operation. If no records changed, the block is not executed.
         op.recordChangedBlock = { record in
             // if record.recordType == "Article"
-            if let page = Article.fromCloud(record) {
+            if let article = Article.fromCloud(record) {
                 // Metadata
                 let coder = NSKeyedArchiver(requiringSecureCoding: true)
                 record.encodeSystemFields(with: coder)
                 coder.finishEncoding()
                 let data = coder.encodedData
-                Store.shared.update(articleId: page.index, page: page, metadata: data)
+                Store.shared.update(articleId: article.index, page: article, metadata: data)
             }
-            os_log("%{public}s", log: logger, "received update for '\(record.recordID)'")
+            os_log("%{public}s", log: logger, "processed push update for '\(record.recordID.recordName)'")
         }
 
         op.recordWithIDWasDeletedBlock = { recordId, recordType in
@@ -214,7 +226,7 @@ struct CloudData {
         op.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
             // Flush record changes and deletions for this zone to disk
             // Write this new zone change token to disk
-            print("recordZoneChangeTokensUpdatedBlock: \(zoneId) -> token = \(token!)")
+            os_log("%{public}s", log: logger, "recordZoneChangeTokensUpdatedBlock: \(zoneId.zoneName) -> token = \(token!)")
         }
 
         // The block to execute when the fetch for a zone has completed.
@@ -222,7 +234,7 @@ struct CloudData {
             if let error = error {
                 print("ERROR: zone fetch completion \(error)")
             }
-            print("recordZoneFetchCompletionBlock: \(zoneId) -> token = \(changeToken!)")
+            os_log("%{public}s", log: logger, "recordZoneFetchCompletionBlock: \(zoneId.zoneName) -> token = \(changeToken!)")
             // Flush to disk
             // Save this token
         }
@@ -241,48 +253,61 @@ struct CloudData {
 
     // MARK: - Initialization
 
-    private func createArticleZone() {
+    private func createArticleZone() throws {
         if Preferences.isCustomZoneCreated {
-            print("Already created zone: \(CloudData.zoneName).")
+            os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneName)' already created.")
             return
         }
 
-        let createZoneGroup = DispatchGroup()
+        let lock = DispatchSemaphore(value: 0)
 
-        createZoneGroup.enter()
+        let zone = CKRecordZone(zoneID: CloudData.zoneID)
 
-        let customZone = CKRecordZone(zoneID: CloudData.zoneID)
-        let createZoneOperation = CKModifyRecordZonesOperation(recordZonesToSave: [customZone], recordZoneIDsToDelete: [])
-        createZoneOperation.modifyRecordZonesCompletionBlock = { saved, deleted, error in
-            defer { createZoneGroup.leave() }
-            if let error = error {
-                print("🔥 ERROR (create zone): \(error)")
-                return
-            }
-            Preferences.isCustomZoneCreated = true
+        var error: Error?
+
+        let op = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: [])
+
+        op.modifyRecordZonesCompletionBlock = { saved, deleted, _error in
+            defer { lock.signal() }
+            error = _error
         }
+        op.qualityOfService = .utility
+        privateDB.add(op)
 
-        createZoneOperation.qualityOfService = .utility
-        privateDB.add(createZoneOperation)
+        lock.wait()
+
+        if let error = error {
+            throw error
+        }
+        os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneID.zoneName)' was created successfully.")
+        Preferences.isCustomZoneCreated = true
     }
 
-    private func createSubscription() {
+    private func createSubscription() throws {
         if Preferences.isSubscribedToPrivateChanges {
-            print("Already subscribed to private changes.")
+            os_log("%{public}s", log: logger, "Already subscribed to private database changes.")
             return
         }
+
+        let lock = DispatchSemaphore(value: 0)
+        var error: Error?
 
         let op = makeSubscriptionOp(id: CloudData.privateSubscriptionID)
 
-        op.modifySubscriptionsCompletionBlock = { subscriptions, deleteIds, error in
-            if let error = error {
-                print("🔥 ERROR (create sub): \(error)")
-                return
-            }
-            print("Subscription \(CloudData.privateSubscriptionID) was successful.")
+        op.modifySubscriptionsCompletionBlock = { subscriptions, deleteIds, _error in
+            defer { lock.signal() }
+            error = _error
         }
 
         privateDB.add(op)
+
+        lock.wait()
+
+        if let error = error {
+            throw error
+        }
+        os_log("%{public}s", log: logger, "Subscription '\(CloudData.privateSubscriptionID)' was successful.")
+        Preferences.isSubscribedToPrivateChanges = true
     }
 
     private func makeSubscriptionOp(id: String) -> CKModifySubscriptionsOperation {
