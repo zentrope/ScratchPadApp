@@ -45,11 +45,22 @@ class EditorViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         editor.textView.delegate = self
+
+        NotificationCenter.default.addObserver(forName: .cloudDataChanged, object: nil, queue: .main) { [weak self] _ in
+            self?.reloadFromStore()
+        }
     }
 
     private func updateText(_ string: NSAttributedString) {
         page.update(string)
         Store.shared.update(article: page)
+    }
+
+    private func reloadFromStore() {
+        // What if there are local changes not found in the updated version? How
+        // do you merge these?
+        self.page = Store.shared.find(index: page.index)
+        editor.attributedString = page.body
     }
 }
 

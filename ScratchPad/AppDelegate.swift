@@ -18,9 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var isInitialized = false
 
     private func openMainWindow() {
-        os_log("%{public}s", log: logger, "open main window on main page")
+        os_log("%{public}s", log: logger, type: .debug, "open main window on main page")
         if !isInitialized {
-            os_log("%{public}s", log: logger, "refusing to open main window until init complete")
+            os_log("%{public}s", log: logger, type: .debug, "refusing to open main window until init complete")
             return
         }
         WindowManager.shared.spawn(Store.shared.mainPage())
@@ -43,15 +43,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        os_log("%{public}s", log: logger, "application finished launching")
         CloudData.shared.setup() {
-            os_log("%{public}s", log: logger, "setup.callback: registering for remote notifications")
             NSApp.registerForRemoteNotifications()
-            os_log("%{public}s", log: logger, "setup.callback: opening main window")
             self.isInitialized = true
             self.openMainWindow()
         }
-        os_log("%{public}s", log: logger, "application finished launching handler complete")
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -61,19 +57,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // This will make the main window appear if it has been closed
         // and the user clicks the app icon, or ⌘-Tabs to the app.
 
-        os_log("%{public}s", log: logger, "application did become active")
-        func noVisibleWindows() -> Bool {
-            for w in NSApp.windows {
-                if w.isVisible {
-                    return false
-                }
-            }
-            return true
-        }
-
-        if noVisibleWindows() {
-            openMainWindow()
-        }
+//        func noVisibleWindows() -> Bool {
+//            for w in NSApp.windows {
+//                if w.isVisible {
+//                    return false
+//                }
+//            }
+//            return true
+//        }
+//
+//        if noVisibleWindows() {
+//            openMainWindow()
+//        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

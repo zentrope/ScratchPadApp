@@ -160,7 +160,13 @@ class CloudData {
         privateDB.add(op)
     }
 
-    // MARK: - Private
+    // MARK: - Convenience
+
+    private func notifyChanges(index: String) {
+        NotificationCenter.default.post(name: .cloudDataChanged, object: self, userInfo: ["page": index])
+    }
+
+    // MARK: - Fetch Changes
 
     // NOTE: an option here might be to make functions that return ops, set
     // dependencies between them, then add them to the database all at once.
@@ -220,17 +226,15 @@ class CloudData {
 
     private func fetchZoneChanges(database: CKDatabase, zoneIDs: [CKRecordZone.ID], completion: @escaping () -> Void) {
 
-        var optionsByRecordZoneID = [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneConfiguration]()
+        var zoneConfigs = [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneConfiguration]()
         for zoneID in zoneIDs {
             let options = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
             options.previousServerChangeToken = nil // pull from preferences? Is there a separate token per zone?
-            optionsByRecordZoneID[zoneID] = options
+            zoneConfigs[zoneID] = options
         }
 
-        let op = CKFetchRecordZoneChangesOperation()
+        let op = CKFetchRecordZoneChangesOperation(recordZoneIDs: zoneIDs, configurationsByRecordZoneID: zoneConfigs)
 
-        op.recordZoneIDs = zoneIDs
-        op.configurationsByRecordZoneID = optionsByRecordZoneID
         op.fetchAllChanges = true
 
         // The block to execute with the contents of a changed record.
@@ -238,10 +242,10 @@ class CloudData {
         op.recordChangedBlock = { record in
             // if record.recordType == "Article"
             if let article = Article.fromCloud(record) {
-                // Metadata
-                let data = self.serializeMetadata(record)
-                self.recordMetadata.swap { $0[article.index] = data }
+                let metadata = self.serializeMetadata(record)
+                self.recordMetadata.swap { $0[article.index] = metadata }
                 Store.shared.replace(article: article)
+                self.notifyChanges(index: article.index)
             }
             os_log("%{public}s", log: logger, "processed push update for '\(record.recordID.recordName)'")
         }
