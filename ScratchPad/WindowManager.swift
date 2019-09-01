@@ -16,7 +16,7 @@ class WindowManager {
     // NOTE: Could create Store object here and pass it in to windows to
     //       facilitate testing.
 
-    static let linkSchema = "scratchpad://" // Set in info.plist
+    static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
     static let shared = WindowManager()
 
     private var windows = [String:EditorWindowController]()
@@ -46,11 +46,11 @@ class WindowManager {
 
     func open(name: String) {
         if let win = windows[name] {
-            os_log("%{public}s", log: logger, "Making \(name) window key")
+            os_log("%{public}s", log: logger, type: .debug, "Making \(name) window key")
             win.window?.makeKeyAndOrderFront(self)
         } else {
-            os_log("%{public}s", log: logger, "Spawning new '\(name)' window")
-            spawn(Store.shared[name])
+            os_log("%{public}s", log: logger, type: .debug, "Spawning new '\(name)' window")
+            spawn(Store.shared.find(index: name))
         }
     }
 
@@ -60,7 +60,7 @@ class WindowManager {
         windows[page.index] = c
     }
 
-    func removeValue(forKey name: String) {
+    func close(forArticle name: String) {
         windows.removeValue(forKey: name)
     }
 
@@ -78,5 +78,4 @@ class WindowManager {
         return link.trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: WindowManager.linkSchema, with: "")
     }
-
 }

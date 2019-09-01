@@ -41,19 +41,8 @@ class EditorWindowController: NSWindowController {
 
 extension EditorWindowController: NSWindowDelegate {
 
-    func windowDidBecomeMain(_ notification: Notification) {
-        os_log("%{public}s", log: logger, "'\(pageName)' window became key window'")
-    }
-
-    func windowDidResignKey(_ notification: Notification) {
-        os_log("%{public}s", log: logger, "'\(pageName)' window resigned key window position")
-        controller.save()
-    }
-
     func windowWillClose(_ notification: Notification) {
-        controller.save()
         self.window?.saveFrame(usingName: saveName)
-        WindowManager.shared.removeValue(forKey: pageName)
-        os_log("%{public}s", log: logger, "\(WindowManager.shared.count) windows remaining")
+        WindowManager.shared.close(forArticle: pageName)
     }
 }

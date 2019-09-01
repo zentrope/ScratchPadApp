@@ -47,12 +47,9 @@ class EditorViewController: NSViewController {
         editor.textView.delegate = self
     }
 
-    func save() {
-        Store.shared.update(page)
-    }
-
     private func updateText(_ string: NSAttributedString) {
         page.update(string)
+        Store.shared.update(article: page)
     }
 }
 
@@ -63,10 +60,6 @@ extension NSMenu {
         }
     }
 }
-
-// Could this me moved up to EditorViewController? That way I could
-// keep all the concerns up there and let this be just for applying
-// constraints.
 
 extension EditorViewController: NSTextViewDelegate {
 

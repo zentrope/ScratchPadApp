@@ -18,7 +18,7 @@ extension Notification.Name {
     static let cloudDataChanged = Notification.Name("cloudDataChanged")
 }
 
-struct CloudData {
+class CloudData {
 
     static let zoneName = "Articles"
     static let zoneID = CKRecordZone.ID(zoneName: CloudData.zoneName, ownerName: CKCurrentUserDefaultName)
@@ -26,8 +26,12 @@ struct CloudData {
 
     static let shared = CloudData()
 
-    let container = CKContainer.default()
-    let privateDB: CKDatabase
+    private let container = CKContainer.default()
+    private let privateDB: CKDatabase
+
+    // Cache for record metadata so we can reconstitute records
+    // for updating the server.
+    private var recordMetadata = Atomic([String:Data]())
 
     init() {
         self.privateDB = container.privateCloudDatabase
@@ -54,6 +58,7 @@ struct CloudData {
     }
 
     func fetchChanges(in databaseScope: CKDatabase.Scope, completion: @escaping () -> Void) {
+        // Don't really need this scope stuff, do we?
         switch databaseScope {
         case .private:
             fetchDatabaseChanges(database: privateDB, completion: completion)
@@ -62,75 +67,94 @@ struct CloudData {
         }
     }
 
-    func save(page: Article) {
-        guard let body = page.bodyString else {
+    /// Create a new article by saving it to the cloud.
+    /// - Parameter article: An article with all the details filled out
+    func create(article: Article) {
+        guard let body = article.bodyString else {
             print("Unable to turn text into string")
             return
         }
 
         let db = CKContainer.default().privateCloudDatabase
 
-        let id = CKRecord.ID(recordName: page.index, zoneID: CloudData.zoneID)
+        let id = CKRecord.ID(recordName: article.index, zoneID: CloudData.zoneID)
         let type = "Article"
-        let article = CKRecord(recordType: type, recordID: id)
+        let record = CKRecord(recordType: type, recordID: id)
 
-        article["name"] = page.name
-        article["body"] = body
-        article["uuid"] = page.uuid.uuidString
-        article["dateCreated"] = page.dateCreated
-        article["dateUpdated"] = page.dateUpdated
+        record["name"] = article.name
+        record["body"] = body
+        record["uuid"] = article.uuid.uuidString
+        record["dateCreated"] = article.dateCreated
+        record["dateUpdated"] = article.dateUpdated
 
-        db.save(article) { (savedArticle, error) in
+        db.save(record) { (savedRecord, error) in
             if let error = error {
                 os_log("%{public}s", log: logger, type: .error, "\(error)")
                 return
             }
 
-            if let saved = savedArticle {
-                os_log("%{public}s", log: logger, "Saved '\(saved.recordID.recordName)' to iCloud.")
+            if let record = savedRecord {
+                let data = self.serializeMetadata(record)
+                self.recordMetadata.swap { $0[article.index] = data }
+                os_log("%{public}s", log: logger, "Saved '\(record.recordID.recordName)' to iCloud.")
             }
         }
     }
 
-    func update(page: Article, metadata: Data?) {
-        os_log("%{public}s", log: logger, type: .debug, "Updating '\(page.index)' in cloud.")
+    /// Update the changes in the article via the associated record metadata.
+    ///
+    /// - Note: This changes **only** the dateUpdated and body attributes..
+    ///
+    /// - Parameter articles: A collection of articles to update
+    /// - Parameter completion: A closure called with the index of each page successfully updated on the server.
+    func update(articles: [Article], _ completion: @escaping (([String]) -> Void)) {
+        let records: [CKRecord] = articles.compactMap { article in
+            guard let recordMetadata = recordMetadata.deref()[article.index] else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(article.index)'")
+                return nil
+            }
 
-        guard let metadata = metadata else {
-            os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(page.index)'")
+            guard let body = article.bodyString else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to decode page body string")
+                return nil
+            }
+
+            guard let coder = try? NSKeyedUnarchiver(forReadingFrom: recordMetadata) else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to create coder from metadata '\(article.index)'")
+                return nil
+            }
+
+            coder.requiresSecureCoding = true
+            let record = CKRecord(coder: coder)
+            coder.finishDecoding()
+
+            guard let update = record else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to unpack record.")
+                return nil
+            }
+
+            update["dateUpdated"] = Date()
+            update["body"] = body
+            return update
+        }
+
+        if records.isEmpty {
+            os_log("%{public}s", log: logger, type: .debug, "None of the \(articles.count) record(s) submitted could be serialized.")
+            completion([String]())
             return
         }
 
-        guard let body = page.bodyString else {
-            os_log("%{public}s", log: logger, type: .error, "Unable to decode page body string")
-            return
-        }
-
-        guard let coder = try? NSKeyedUnarchiver(forReadingFrom: metadata) else {
-            os_log("%{public}s", log: logger, type: .error, "Unable to create coder from metadata '\(page.index)'")
-            return
-        }
-        coder.requiresSecureCoding = true
-        let record = CKRecord(coder: coder)
-        coder.finishDecoding()
-
-        guard let update = record else {
-            os_log("%{public}s", log: logger, type: .error, "Unable to unpack record.")
-            return
-        }
-
-        update["dateUpdated"] = Date()
-        update["body"] = body
-
-        let op = CKModifyRecordsOperation(recordsToSave: [update], recordIDsToDelete: [])
+        let op = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: [])
         op.savePolicy = .changedKeys
         op.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedIds, error) in
             if let error = error {
-                os_log("%{public}s", log: logger, type: .error, "Unable to update '\(page.index)', error: '\(error)'.")
+                os_log("%{public}s", log: logger, type: .error, "\(error)")
                 return
             }
-            if let saves = savedRecords {
-                let indexes = saves.map { $0.recordID.recordName }
+            if let records = savedRecords {
+                let indexes = records.map { $0.recordID.recordName }
                 os_log("%{public}s", log: logger, "Updated success for \(indexes)")
+                completion(indexes)
             }
         }
         privateDB.add(op)
@@ -187,6 +211,13 @@ struct CloudData {
         database.add(op)
     }
 
+    private func serializeMetadata(_ record: CKRecord) -> Data {
+        let coder = NSKeyedArchiver(requiringSecureCoding: true)
+        record.encodeSystemFields(with: coder)
+        coder.finishEncoding()
+        return coder.encodedData
+    }
+
     private func fetchZoneChanges(database: CKDatabase, zoneIDs: [CKRecordZone.ID], completion: @escaping () -> Void) {
 
         var optionsByRecordZoneID = [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneConfiguration]()
@@ -208,11 +239,9 @@ struct CloudData {
             // if record.recordType == "Article"
             if let article = Article.fromCloud(record) {
                 // Metadata
-                let coder = NSKeyedArchiver(requiringSecureCoding: true)
-                record.encodeSystemFields(with: coder)
-                coder.finishEncoding()
-                let data = coder.encodedData
-                Store.shared.update(articleId: article.index, page: article, metadata: data)
+                let data = self.serializeMetadata(record)
+                self.recordMetadata.swap { $0[article.index] = data }
+                Store.shared.replace(article: article)
             }
             os_log("%{public}s", log: logger, "processed push update for '\(record.recordID.recordName)'")
         }
