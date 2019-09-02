@@ -26,10 +26,10 @@ class EditorWindowController: NSWindowController {
         }
     }
 
-    init(page: Article) {
+    init(page: Page) {
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
-        self.pageName = page.index
+        self.pageName = page.name
         self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
         self.controller = EditorViewController(page: page)
 
@@ -51,6 +51,7 @@ class EditorWindowController: NSWindowController {
 extension EditorWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
+
         // Hide then show the inspector bar because somehow there's a 26pt gap
         // between the inspector and the contentView if we don't. Some sort of
         // layout issue due to the way I'm programatticaly creating the window
@@ -62,6 +63,6 @@ extension EditorWindowController: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: saveName)
-        WindowManager.shared.close(forArticle: pageName)
+        WindowManager.shared.close(forPageNamed: pageName)
     }
 }

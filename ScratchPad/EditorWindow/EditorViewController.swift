@@ -12,9 +12,9 @@ class EditorViewController: NSViewController {
 
     private let editor = EditorTextView()
 
-    private var page: Article
+    private var page: Page
 
-    init(page: Article) {
+    init(page: Page) {
         self.page = page
         super.init(nibName: nil, bundle: nil)
         editor.attributedString = page.body
@@ -52,14 +52,14 @@ class EditorViewController: NSViewController {
     }
 
     private func updateText(_ string: NSAttributedString) {
-        page.update(string)
-        Store.shared.update(article: page)
+        page.body = string
+        Store.shared.update(page: page)
     }
 
     private func reloadFromStore() {
         // What if there are local changes not found in the updated version? How
         // do you merge these?
-        self.page = Store.shared.find(index: page.index)
+        self.page = Store.shared.find(index: page.name)
         editor.attributedString = page.body
     }
 }

@@ -55,7 +55,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidBecomeActive(_ notification: Notification) {
         // This will make the main window appear if it has been closed
-        // and the user clicks the app icon, or ⌘-Tabs to the app.
+        // and the user ⌘-Tabs to the app or at any other moment when
+        // it's foregrounded.
 
 //        func noVisibleWindows() -> Bool {
 //            for w in NSApp.windows {

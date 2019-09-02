@@ -54,13 +54,13 @@ class WindowManager {
         }
     }
 
-    func spawn(_ page: Article) {
+    func spawn(_ page: Page) {
         let c = EditorWindowController(page: page)
         c.window?.makeKeyAndOrderFront(self)
-        windows[page.index] = c
+        windows[page.name] = c
     }
 
-    func close(forArticle name: String) {
+    func close(forPageNamed name: String) {
         windows.removeValue(forKey: name)
     }
 
