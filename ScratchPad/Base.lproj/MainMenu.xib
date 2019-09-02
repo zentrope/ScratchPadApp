@@ -580,8 +580,8 @@
                                             </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="fKy-g9-1gm"/>
-                                        <menuItem title="Show Ruler" id="vLm-3I-IUL">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="Show Ruler" alternate="YES" keyEquivalent="r" id="vLm-3I-IUL">
+                                            <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
                                                 <action selector="toggleRuler:" target="-1" id="FOx-HJ-KwY"/>
                                             </connections>

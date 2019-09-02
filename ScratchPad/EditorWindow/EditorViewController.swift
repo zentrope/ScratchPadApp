@@ -26,7 +26,7 @@ class EditorViewController: NSViewController {
     }
 
     override func loadView() {
-        let view = NSView()
+        let view = NSView(frame: .zero)
         editor.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(editor)
 

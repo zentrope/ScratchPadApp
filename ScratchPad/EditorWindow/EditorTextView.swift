@@ -49,12 +49,21 @@ class EditorTextView: NSView {
         textView.isEditable = true
         textView.isSelectable = true
         textView.allowsUndo = true
+
+        textView.usesInspectorBar = true
+        textView.usesRuler = true
+        textView.usesFindBar = true
+
         textView.font = NSFont.systemFont(ofSize: 16)
-        textView.textContainerInset = NSMakeSize(5, 5)
+        textView.textContainerInset = NSMakeSize(10, 10)
         textView.autoresizingMask = [.width, .height]
+
         textView.isRichText = true
         textView.isAutomaticDataDetectionEnabled = true
         textView.isAutomaticLinkDetectionEnabled = true
+        textView.isContinuousSpellCheckingEnabled = true
+        textView.isAutomaticSpellingCorrectionEnabled = true
+        textView.isAutomaticQuoteSubstitutionEnabled = true
     }
 }
 
