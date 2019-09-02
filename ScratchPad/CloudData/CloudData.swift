@@ -166,17 +166,29 @@ class CloudData {
         NotificationCenter.default.post(name: .cloudDataChanged, object: self, userInfo: ["page": index])
     }
 
+    private func updateRecord(_ record: CKRecord) {
+        if let article = Article.fromCloud(record) {
+            let metadata = serializeMetadata(record)
+            recordMetadata.swap { $0[article.index] = metadata }
+            Store.shared.replace(article: article)
+            notifyChanges(index: article.index)
+            os_log("%{public}s", log: logger, "Processed a push update for '\(record.recordID.recordName)'.")
+        }
+    }
+
     // MARK: - Fetch Changes
 
     // NOTE: an option here might be to make functions that return ops, set
     // dependencies between them, then add them to the database all at once.
+
+    private var databaseChangeToken: CKServerChangeToken?
 
     private func fetchDatabaseChanges(database: CKDatabase, completion: @escaping () -> Void) {
 
         // Deal with changes to the zones themselves.
 
         var changedZoneIDs = [CKRecordZone.ID]()
-        let changeToken: CKServerChangeToken? = nil // Should be preserved when there's a cache on disk
+        let changeToken: CKServerChangeToken? = databaseChangeToken
         let op = CKFetchDatabaseChangesOperation(previousServerChangeToken: changeToken)
 
         op.recordZoneWithIDChangedBlock = { zoneID in
@@ -191,18 +203,18 @@ class CloudData {
         op.changeTokenUpdatedBlock = { token in
             // flush zone deletions to disk
             // save the new token to be used on subsequent starts
-
+            self.databaseChangeToken = token
         }
 
-        op.fetchDatabaseChangesCompletionBlock = { token, moreComing, error in
+        op.fetchDatabaseChangesCompletionBlock = { token, _, error in
             if let error = error {
-                // Should set an alert
-                os_log("%{public}s", log: logger, type: .error, "\(error)")
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
                 completion()
                 return
             }
 
-            os_log("%{public}s", log: logger, "database change token \(String(describing: token))")
+            self.databaseChangeToken = token
+            os_log("%{public}s", log: logger, type: .debug, "saved database change token")
 
             // If the Articles zone is deleted, mark it uncreated in
             // preferences? Then what? Recreated it?
@@ -224,12 +236,16 @@ class CloudData {
         return coder.encodedData
     }
 
+    // Not saved to disk until we have disk caching, but saved in memory
+    // so push notifications don't replay all history.
+    private var zoneRecordToken: CKServerChangeToken?
+
     private func fetchZoneChanges(database: CKDatabase, zoneIDs: [CKRecordZone.ID], completion: @escaping () -> Void) {
 
         var zoneConfigs = [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneConfiguration]()
         for zoneID in zoneIDs {
             let options = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
-            options.previousServerChangeToken = nil // pull from preferences? Is there a separate token per zone?
+            options.previousServerChangeToken = zoneRecordToken
             zoneConfigs[zoneID] = options
         }
 
@@ -237,44 +253,31 @@ class CloudData {
 
         op.fetchAllChanges = true
 
-        // The block to execute with the contents of a changed record.
-        // The operation object executes this block once for each record in the zone that changed since the previous fetch request. Each time the block is executed, it is executed serially with respect to the other progress blocks of the operation. If no records changed, the block is not executed.
         op.recordChangedBlock = { record in
-            // if record.recordType == "Article"
-            if let article = Article.fromCloud(record) {
-                let metadata = self.serializeMetadata(record)
-                self.recordMetadata.swap { $0[article.index] = metadata }
-                Store.shared.replace(article: article)
-                self.notifyChanges(index: article.index)
-            }
-            os_log("%{public}s", log: logger, "processed push update for '\(record.recordID.recordName)'")
+            self.updateRecord(record)
         }
 
         op.recordWithIDWasDeletedBlock = { recordId, recordType in
-            print("deleted", recordId, recordType)
+            os_log("%{public}s", log: logger, type: .error, "A request to delete a record arrived, but doing so is not implemented.")
         }
 
-        // The block to execute when the change token has been updated.
         op.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
-            // Flush record changes and deletions for this zone to disk
-            // Write this new zone change token to disk
-            os_log("%{public}s", log: logger, "recordZoneChangeTokensUpdatedBlock: \(zoneId.zoneName) -> token = \(token!)")
+            os_log("%{public}s", log: logger, type: .debug, "Saved zone '\(zoneId.zoneName)' change token.")
+            self.zoneRecordToken = token
         }
 
-        // The block to execute when the fetch for a zone has completed.
         op.recordZoneFetchCompletionBlock = { (zoneId, changeToken, _, _, error) in
             if let error = error {
-                print("ERROR: zone fetch completion \(error)")
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
+                return
             }
-            os_log("%{public}s", log: logger, "recordZoneFetchCompletionBlock: \(zoneId.zoneName) -> token = \(changeToken!)")
-            // Flush to disk
-            // Save this token
+            os_log("%{public}s", log: logger, type: .debug, "Zone fetching is complete: saved zone '\(zoneId.zoneName)' change token.")
+            self.zoneRecordToken = changeToken
         }
 
-        // The block to use to process the record zone changes.
         op.fetchRecordZoneChangesCompletionBlock = { (error) in
             if let error = error {
-                print("Error fetching zone change:", error)
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
             }
             completion()
         }
