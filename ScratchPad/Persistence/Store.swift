@@ -67,7 +67,7 @@ class Store {
 
     func update(page: Page) {
         // Receives updates from the UI
-        database.saveContext()
+
         changes.swap { $0.insert(page.name.lowercased()) }
     }
 
@@ -78,6 +78,8 @@ class Store {
     }
 
     private func scheduleChangesForUpload() {
+
+        database.saveContext()
 
         let pageNames = self.changes.deref()
         if pageNames.isEmpty {

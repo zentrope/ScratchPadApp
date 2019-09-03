@@ -21,7 +21,6 @@ class Database {
     init() {
         persistentContainer = NSPersistentContainer(name: "ScratchPadModel")
         persistentContainer.loadPersistentStores { storeDescription, error in
-            os_log("%{public}s", log: logger, "Loading persistent store in '\(storeDescription)'.")
             self.persistentContainer.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             if let error = error {
                 os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
@@ -73,9 +72,12 @@ class Database {
     }
 
     func saveContext() {
-        if persistentContainer.viewContext.hasChanges {
+        guard persistentContainer.viewContext.hasChanges else { return }
+        self.persistentContainer.viewContext.perform {
             do {
-                try persistentContainer.viewContext.save()
+                if self.persistentContainer.viewContext.hasChanges {
+                    try self.persistentContainer.viewContext.save()
+                }
             } catch {
                 os_log("%{public}s", log: logger, type: .error, "CoreData.save \(error)")
             }

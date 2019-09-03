@@ -178,17 +178,14 @@ class CloudData {
 
     // Called when CloudKit receives a new/update record from iCloud
     private func updateRecord(_ record: CKRecord) {
-        setMetadata(forPageName: record.recordID.recordName.lowercased(), record: record)
+        let key = record.recordID.recordName.lowercased()
+        setMetadata(forPageName: key, record: record)
         store.replace(record: record)
-        notifyChanges(index: record.recordID.recordName)
-        os_log("%{public}s", log: logger, "Processed a push update for '\(record.recordID.recordName.lowercased())'.")
+        notifyChanges(index: key)
+        os_log("%{public}s", log: logger, "Processed a push update for '\(key)'.")
     }
 
     // MARK: - Fetch Changes
-
-    // NOTE: an option here might be to make functions that return ops, set dependencies between them, then add them to the database all at once.
-
-    //private var databaseChangeToken: CKServerChangeToken?
 
     private func fetchDatabaseChanges(database: CKDatabase, completion: @escaping () -> Void) {
 
