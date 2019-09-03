@@ -13,8 +13,6 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "CloudData")
 
-// https://apple.co/2NJjCsE
-
 extension Notification.Name {
     static let cloudDataChanged = Notification.Name("cloudDataChanged")
 }
@@ -27,6 +25,8 @@ class CloudData {
 
     static let shared = CloudData()
 
+    private var preferences: ScratchPadPrefs!
+
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
 
@@ -36,6 +36,12 @@ class CloudData {
 
     init() {
         self.privateDB = container.privateCloudDatabase
+        self.preferences = Preferences()
+    }
+
+    init(preferences: ScratchPadPrefs) {
+        self.privateDB = container.privateCloudDatabase
+        self.preferences = preferences
     }
 
     func setup(_ completion: @escaping () -> Void) {
@@ -181,8 +187,7 @@ class CloudData {
 
     // MARK: - Fetch Changes
 
-    // NOTE: an option here might be to make functions that return ops, set
-    // dependencies between them, then add them to the database all at once.
+    // NOTE: an option here might be to make functions that return ops, set dependencies between them, then add them to the database all at once.
 
     private var databaseChangeToken: CKServerChangeToken?
 
@@ -201,8 +206,8 @@ class CloudData {
         op.recordZoneWithIDWasDeletedBlock = { zoneID in
             // Should save this in a vector to react to it
             print("Zone \(zoneID) was deleted. How can this be!")
-            Preferences.isSubscribedToPrivateChanges = false
-            Preferences.isCustomZoneCreated = false
+            self.preferences.isSubscribedToPrivateChanges = false
+            self.preferences.isCustomZoneCreated = false
         }
 
         op.changeTokenUpdatedBlock = { token in
@@ -295,7 +300,7 @@ class CloudData {
 
     private func createCustomZone() throws {
         os_log("%{public}s", log: logger, "Create zone '\(CloudData.zoneName)' if necessary.")
-        if Preferences.isCustomZoneCreated {
+        if preferences.isCustomZoneCreated {
             os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneName)' already created.")
             return
         }
@@ -321,12 +326,12 @@ class CloudData {
             throw error
         }
         os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneID.zoneName)' was created successfully.")
-        Preferences.isCustomZoneCreated = true
+        preferences.isCustomZoneCreated = true
     }
 
     private func createSubscription() throws {
         os_log("%{public}s", log: logger, "Subscribe to private database changes if necessary.")
-        if Preferences.isSubscribedToPrivateChanges {
+        if preferences.isSubscribedToPrivateChanges {
             os_log("%{public}s", log: logger, "Already subscribed to private database changes.")
             return
         }
@@ -349,7 +354,7 @@ class CloudData {
             throw error
         }
         os_log("%{public}s", log: logger, "Subscription '\(CloudData.privateSubscriptionID)' was successful.")
-        Preferences.isSubscribedToPrivateChanges = true
+        preferences.isSubscribedToPrivateChanges = true
     }
 
     private func makeSubscriptionOp(id: String) -> CKModifySubscriptionsOperation {

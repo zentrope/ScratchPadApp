@@ -142,12 +142,11 @@ extension Store {
             return nil
         }
 
-        // Conver the RTF string representation into data to build an NSAttributedString.
+        // Convert the RTF string representation into data to build an NSAttributedString.
         guard let data = rtfString.data(using: .utf8) else {
             os_log("%{public}s", log: logger, type: .error, "Unable to convert rtf string to data")
             return nil
         }
-
 
         if let name = record["name"] as? String,
             let dateCreated = record["dateCreated"] as? Date,
