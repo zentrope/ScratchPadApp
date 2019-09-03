@@ -23,7 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             os_log("%{public}s", log: logger, type: .debug, "refusing to open main window until init complete")
             return
         }
-        WindowManager.shared.spawn(Store.shared.mainPage())
+        WindowManager.shared.spawnMainPage()
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

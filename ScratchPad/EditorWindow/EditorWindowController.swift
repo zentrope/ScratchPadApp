@@ -16,6 +16,7 @@ class EditorWindowController: NSWindowController {
     private var controller: EditorViewController
     private var pageName: String
     private var saveName: NSWindow.FrameAutosaveName
+    private var store: Store!
 
     private var isInspectorVisible: Bool = true {
         didSet {
@@ -26,12 +27,13 @@ class EditorWindowController: NSWindowController {
         }
     }
 
-    init(page: Page) {
+    init(store: Store, page: Page) {
+        self.store = store
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
         self.pageName = page.name
         self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
-        self.controller = EditorViewController(page: page)
+        self.controller = EditorViewController(store: store, page: page)
 
         super.init(window: window)
 

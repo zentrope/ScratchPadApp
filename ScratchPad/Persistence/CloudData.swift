@@ -26,6 +26,7 @@ class CloudData {
     static let shared = CloudData()
 
     private var preferences: ScratchPadPrefs!
+    private var store: Store!
 
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
@@ -37,11 +38,13 @@ class CloudData {
     init() {
         self.privateDB = container.privateCloudDatabase
         self.preferences = Preferences()
+        self.store = Store.shared
     }
 
-    init(preferences: ScratchPadPrefs) {
+    init(preferences: ScratchPadPrefs, store: Store) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
+        self.store = store
     }
 
     func setup(_ completion: @escaping () -> Void) {
@@ -180,7 +183,7 @@ class CloudData {
     private func updateRecord(_ record: CKRecord) {
         let metadata = serializeMetadata(record)
         recordMetadata.swap { $0[record.recordID.recordName.lowercased()] = metadata }
-        Store.shared.replace(record: record)
+        store.replace(record: record)
         notifyChanges(index: record.recordID.recordName)
         os_log("%{public}s", log: logger, "Processed a push update for '\(record.recordID.recordName.lowercased())'.")
     }

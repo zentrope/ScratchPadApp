@@ -13,19 +13,23 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 
 class WindowManager {
 
-    // NOTE: Could create Store object here and pass it in to windows to
-    //       facilitate testing.
-
     static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
     static let shared = WindowManager()
 
     private var windows = [String:EditorWindowController]()
+
+    private var store: Store
 
     var count: Int {
         get { return windows.count }
     }
 
     init() {
+        self.store = Store.shared
+    }
+
+    init(store: Store) {
+        self.store = store
     }
 
     func isScratchPadLink(link: String) -> Bool {
@@ -50,12 +54,16 @@ class WindowManager {
             win.window?.makeKeyAndOrderFront(self)
         } else {
             os_log("%{public}s", log: logger, type: .debug, "Spawning new '\(name)' window")
-            spawn(Store.shared.find(index: name))
+            spawn(store.find(index: name))
         }
     }
 
+    func spawnMainPage() {
+        spawn(store.mainPage())
+    }
+
     func spawn(_ page: Page) {
-        let c = EditorWindowController(page: page)
+        let c = EditorWindowController(store: store, page: page)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.name] = c
     }

@@ -13,9 +13,11 @@ class EditorViewController: NSViewController {
     private let editor = EditorTextView()
 
     private var page: Page
+    private var store: Store
 
-    init(page: Page) {
+    init(store: Store, page: Page) {
         self.page = page
+        self.store = store
         super.init(nibName: nil, bundle: nil)
         editor.attributedString = page.body
         render(editor.textView)
@@ -53,13 +55,13 @@ class EditorViewController: NSViewController {
 
     private func updateText(_ string: NSAttributedString) {
         page.body = string
-        Store.shared.update(page: page)
+        store.update(page: page)
     }
 
     private func reloadFromStore() {
         // What if there are local changes not found in the updated version? How
         // do you merge these?
-        self.page = Store.shared.find(index: page.name)
+        self.page = store.find(index: page.name)
         editor.attributedString = page.body
     }
 }
@@ -137,7 +139,7 @@ extension EditorViewController: NSTextViewDelegate {
         // TODO: This will remove legit http links, too. Hm.
         // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
         source.removeAttribute(.link, range: NSMakeRange(0, source.length))
-        for title in Store.shared.names {
+        for title in store.names {
             let link = WindowManager.shared.makeLink(title)
             do {
                 try source.addLink(word: title, link: link)
