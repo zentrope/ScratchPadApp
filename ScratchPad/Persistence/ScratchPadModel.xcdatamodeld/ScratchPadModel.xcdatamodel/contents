@@ -11,7 +11,17 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
+    <entity name="RecordMetadata" representedClassName="RecordMetadata" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="record" optional="YES" attributeType="Transformable" valueTransformerName="CKMetadataValueTransformer"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="name"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
     <elements>
         <element name="Page" positionX="-63" positionY="-18" width="128" height="103"/>
+        <element name="RecordMetadata" positionX="-63" positionY="9" width="128" height="73"/>
     </elements>
 </model>

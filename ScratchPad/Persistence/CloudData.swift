@@ -27,24 +27,23 @@ class CloudData {
 
     private var preferences: ScratchPadPrefs!
     private var store: Store!
+    private var database: Database!
 
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
-
-    // Cache for record metadata so we can reconstitute records
-    // for updating the server.
-    private var recordMetadata = Atomic([String:Data]())
 
     init() {
         self.privateDB = container.privateCloudDatabase
         self.preferences = Preferences()
         self.store = Store.shared
+        self.database = Database.main
     }
 
-    init(preferences: ScratchPadPrefs, store: Store) {
+    init(preferences: ScratchPadPrefs, store: Store, database: Database) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
         self.store = store
+        self.database = database
     }
 
     func setup(_ completion: @escaping () -> Void) {
@@ -101,8 +100,7 @@ class CloudData {
             }
 
             if let record = savedRecord {
-                let data = self.serializeMetadata(record)
-                self.recordMetadata.swap { $0[page.name.lowercased()] = data }
+                self.setMetadata(forPageName: page.name.lowercased(), record: record)
                 os_log("%{public}s", log: logger, "Saved '\(record.recordID.recordName)' to iCloud.")
             }
         }
@@ -112,9 +110,10 @@ class CloudData {
 
         let records: [CKRecord] = pages.compactMap { page in
             let key = page.name.lowercased()
-            guard let recordMetadata = recordMetadata.deref()[key] else {
+
+            guard let update = self.getRecordFromMetadata(name: key) else {
                 os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(page.name.lowercased())'")
-                print(self.recordMetadata.deref().keys)
+
                 // FIXME: This is not good. We need a way to figure out what's local only and sync it to the cloud.
                 create(page: page)
                 return nil
@@ -122,20 +121,6 @@ class CloudData {
 
             guard let body = page.bodyString else {
                 os_log("%{public}s", log: logger, type: .error, "Unable to decode page body string")
-                return nil
-            }
-
-            guard let coder = try? NSKeyedUnarchiver(forReadingFrom: recordMetadata) else {
-                os_log("%{public}s", log: logger, type: .error, "Unable to create coder from metadata '\(page.name)'")
-                return nil
-            }
-
-            coder.requiresSecureCoding = true
-            let record = CKRecord(coder: coder)
-            coder.finishDecoding()
-
-            guard let update = record else {
-                os_log("%{public}s", log: logger, type: .error, "Unable to recreate record from metadata.")
                 return nil
             }
 
@@ -164,8 +149,7 @@ class CloudData {
 
                 records.forEach { record in
                     let key = record.recordID.recordName.lowercased()
-                    let data = self.serializeMetadata(record)
-                    self.recordMetadata.swap { $0[key] = data }
+                    self.setMetadata(forPageName: key, record: record)
                 }
 
                 completion(indexes)
@@ -176,13 +160,25 @@ class CloudData {
 
     // MARK: - Convenience
 
+    private func setMetadata(forPageName name: String, record: CKRecord) {
+        let recordMetadata = database.makeRecordMetadataStub()
+        recordMetadata.name = name.lowercased()
+        recordMetadata.record = record
+        database.saveContext()
+    }
+
+    private func getRecordFromMetadata(name: String) -> CKRecord? {
+        guard let recordAccount = database.fetchRecordMetadata(name: name) else { return nil }
+        return recordAccount.record as? CKRecord
+    }
+
     private func notifyChanges(index: String) {
         NotificationCenter.default.post(name: .cloudDataChanged, object: self, userInfo: ["page": index])
     }
 
+    // Called when CloudKit receives a new/update record from iCloud
     private func updateRecord(_ record: CKRecord) {
-        let metadata = serializeMetadata(record)
-        recordMetadata.swap { $0[record.recordID.recordName.lowercased()] = metadata }
+        setMetadata(forPageName: record.recordID.recordName.lowercased(), record: record)
         store.replace(record: record)
         notifyChanges(index: record.recordID.recordName)
         os_log("%{public}s", log: logger, "Processed a push update for '\(record.recordID.recordName.lowercased())'.")
@@ -249,8 +245,7 @@ class CloudData {
         return coder.encodedData
     }
 
-    // Not saved to disk until we have disk caching, but saved in memory
-    // so push notifications don't replay all history.
+    // Not saved to disk until we have disk caching, but saved in memory so push notifications don't replay all history.
     private var zoneRecordToken: CKServerChangeToken?
 
     private func fetchZoneChanges(database: CKDatabase, zoneIDs: [CKRecordZone.ID], completion: @escaping () -> Void) {

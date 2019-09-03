@@ -19,8 +19,7 @@ class Store {
 
     private let mainArticleIndex = "main"
 
-    // Core Data
-    private var container: NSPersistentContainer!
+    private var database: Database!
 
     // Cache
     private var changes = Atomic(Set<String>())
@@ -28,20 +27,17 @@ class Store {
     // Names are used to create links in page text for clickable navigation
     var names: [String] {
         get {
-            return fetchNames()
+            return database.fetchNames()
         }
     }
 
     init() {
-        container = NSPersistentContainer(name: "ScratchPadModel")
-        container.loadPersistentStores { storeDescription, error in
-            os_log("%{public}s", log: logger, "Loading persistent store in '\(storeDescription)'.")
-            self.container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-            if let error = error {
-                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
-            }
-        }
+        database = Database.main
+        scheduleChangeMonitor()
+    }
 
+    init(database: Database) {
+        self.database = database
         scheduleChangeMonitor()
     }
 
@@ -55,7 +51,7 @@ class Store {
         // Fetch the page from the database, or create (and save and sync)
         // a new one if we can't find it.
 
-        if let page = fetchPage(name: index) {
+        if let page = database.fetch(page: index) {
             return page
         }
         return newPage(name: index)
@@ -64,14 +60,14 @@ class Store {
     
     func replace(record: CKRecord) {
         if let page = fromRecord(record: record) {
-            self.saveContext()
+            database.saveContext()
             changes.swap { $0.remove(page.name.lowercased()) }
         }
     }
 
     func update(page: Page) {
         // Receives updates from the UI
-        saveContext() //
+        database.saveContext()
         changes.swap { $0.insert(page.name.lowercased()) }
     }
 
@@ -91,7 +87,7 @@ class Store {
 
         var pages = [Page]()
         for name in pageNames {
-            if let page = fetchPage(name: name) {
+            if let page = database.fetch(page: name) {
                 pages.append(page)
             }
         }
@@ -119,13 +115,13 @@ class Store {
         let message = name.lowercased() == mainArticleIndex.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
         let body = NSAttributedString(string: message, attributes: attrs)
 
-        let page = Page(context: container.viewContext)
+        let page = database.makePageStub()
         page.name = name.lowercased()
         page.dateCreated = Date()
         page.dateUpdated = Date()
         page.body = body
 
-        saveContext()
+        database.saveContext()
         return page
     }
 }
@@ -153,7 +149,7 @@ extension Store {
             let dateUpdated = record["dateUpdated"] as? Date,
             let body = NSAttributedString(rtf: data, documentAttributes: nil) {
 
-            let page = Page(context: container.viewContext)
+            let page = database.makePageStub()
             page.name = name
             page.dateCreated = dateCreated
             page.dateUpdated = dateUpdated
@@ -163,38 +159,5 @@ extension Store {
 
         os_log("%{public}s", log: logger, type: .error, "Unable to create a Page from a Record.")
         return nil
-    }
-
-    func fetchPage(name: String) -> Page? {
-        do {
-            let request: NSFetchRequest<Page> = Page.fetchRequest()
-            request.predicate = NSPredicate(format: "name ==[c] %@", name)
-            let pages = try container.viewContext.fetch(request)
-            return pages.first
-        } catch {
-            os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
-            return nil
-        }
-    }
-
-    func fetchNames() -> [String] {
-        do {
-            let request: NSFetchRequest<Page> = Page.fetchRequest()
-            let pages: [Page] = try container.viewContext.fetch(request)
-            return pages.map { $0.name }
-        } catch {
-            os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
-        }
-        return [String]()
-    }
-
-    func saveContext() {
-        if container.viewContext.hasChanges {
-            do {
-                try container.viewContext.save()
-            } catch {
-                os_log("%{public}s", log: logger, type: .error, "CoreData.save \(error)")
-            }
-        }
     }
 }
