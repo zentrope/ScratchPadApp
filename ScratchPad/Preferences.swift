@@ -32,23 +32,28 @@ struct Preferences: ScratchPadPrefs {
     }
 
     var databaseChangeToken: CKServerChangeToken? {
-        get { return UserDefaults.standard.ckServerChangeToken(forKey: "databaseChangeToken") }
-        set { UserDefaults.standard.set(newValue, forKey: "databaseChangeToken") }
+        get { return UserDefaults.standard.ckServerChangeToken(forKey: "CloudKitDatabaseChangeToken") }
+        set { UserDefaults.standard.set(newValue, forKey: "CloudKitDatabaseChangeToken") }
     }
 
     var zoneRecordChangeToken: CKServerChangeToken? {
-        get { return UserDefaults.standard.ckServerChangeToken(forKey: "ZoneRecordChangeToken") }
-        set { UserDefaults.standard.set(newValue, forKey: "ZoneRecordChangeToken") }
+        get { return UserDefaults.standard.ckServerChangeToken(forKey: "CloudKitZoneRecordChangeToken") }
+        set { UserDefaults.standard.set(newValue, forKey: "CloudKitZoneRecordChangeToken") }
     }
 }
 
 public extension UserDefaults {
 
-    func set(_ value: CKServerChangeToken, forKey key: String) {
+    func set(_ value: CKServerChangeToken?, forKey key: String) {
+        guard let token = value else {
+            self.removeObject(forKey: key)
+            return
+        }
         do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: false)
+            let data = try NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)
             self.set(data, forKey: key)
         } catch {
+            print("ERROR: \(error)")
             self.removeObject(forKey: key)
         }
     }

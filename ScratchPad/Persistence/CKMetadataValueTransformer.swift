@@ -9,6 +9,7 @@
 import Cocoa
 import CloudKit
 
+@objc(CKMetadataValueTransformer)
 class CKMetadataValueTransformer: ValueTransformer {
 
     override class func transformedValueClass() -> AnyClass {

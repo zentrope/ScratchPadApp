@@ -188,31 +188,30 @@ class CloudData {
 
     // NOTE: an option here might be to make functions that return ops, set dependencies between them, then add them to the database all at once.
 
-    private var databaseChangeToken: CKServerChangeToken?
+    //private var databaseChangeToken: CKServerChangeToken?
 
     private func fetchDatabaseChanges(database: CKDatabase, completion: @escaping () -> Void) {
 
         // Deal with changes to the zones themselves.
 
         var changedZoneIDs = [CKRecordZone.ID]()
-        let changeToken: CKServerChangeToken? = databaseChangeToken
-        let op = CKFetchDatabaseChangesOperation(previousServerChangeToken: changeToken)
+
+        let op = CKFetchDatabaseChangesOperation(previousServerChangeToken: preferences.databaseChangeToken)
 
         op.recordZoneWithIDChangedBlock = { zoneID in
+            os_log("%{public}s", log: logger, "There's a change in zone '\(zoneID.zoneName)'.")
             changedZoneIDs.append(zoneID)
         }
 
         op.recordZoneWithIDWasDeletedBlock = { zoneID in
-            // Should save this in a vector to react to it
-            print("Zone \(zoneID) was deleted. How can this be!")
+            // If this mattered to us, delete all the data associated with that zone.
+            print("Zone \(zoneID) was deleted.")
             self.preferences.isSubscribedToPrivateChanges = false
             self.preferences.isCustomZoneCreated = false
         }
 
         op.changeTokenUpdatedBlock = { token in
-            // flush zone deletions to disk
-            // save the new token to be used on subsequent starts
-            self.databaseChangeToken = token
+            self.preferences.databaseChangeToken = token
         }
 
         op.fetchDatabaseChangesCompletionBlock = { token, _, error in
@@ -222,14 +221,15 @@ class CloudData {
                 return
             }
 
-            self.databaseChangeToken = token
-            os_log("%{public}s", log: logger, type: .debug, "saved database change token")
+            self.preferences.databaseChangeToken = token
+            os_log("%{public}s", log: logger, type: .debug, "Saved database change token")
 
-            // If the Articles zone is deleted, mark it uncreated in
-            // preferences? Then what? Recreated it?
+            if changedZoneIDs.isEmpty {
+                completion()
+                return
+            }
 
             self.fetchZoneChanges(database: database, zoneIDs: changedZoneIDs) {
-                // Flush token to disk
                 completion()
             }
         }
@@ -238,22 +238,12 @@ class CloudData {
         database.add(op)
     }
 
-    private func serializeMetadata(_ record: CKRecord) -> Data {
-        let coder = NSKeyedArchiver(requiringSecureCoding: true)
-        record.encodeSystemFields(with: coder)
-        coder.finishEncoding()
-        return coder.encodedData
-    }
-
-    // Not saved to disk until we have disk caching, but saved in memory so push notifications don't replay all history.
-    private var zoneRecordToken: CKServerChangeToken?
-
     private func fetchZoneChanges(database: CKDatabase, zoneIDs: [CKRecordZone.ID], completion: @escaping () -> Void) {
 
         var zoneConfigs = [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneConfiguration]()
         for zoneID in zoneIDs {
             let options = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
-            options.previousServerChangeToken = zoneRecordToken
+            options.previousServerChangeToken = preferences.zoneRecordChangeToken
             zoneConfigs[zoneID] = options
         }
 
@@ -271,7 +261,7 @@ class CloudData {
 
         op.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
             os_log("%{public}s", log: logger, type: .debug, "Saved zone '\(zoneId.zoneName)' change token.")
-            self.zoneRecordToken = token
+            self.preferences.zoneRecordChangeToken = token
         }
 
         op.recordZoneFetchCompletionBlock = { (zoneId, changeToken, _, _, error) in
@@ -280,7 +270,7 @@ class CloudData {
                 return
             }
             os_log("%{public}s", log: logger, type: .debug, "Zone fetching is complete: saved zone '\(zoneId.zoneName)' change token.")
-            self.zoneRecordToken = changeToken
+            self.preferences.zoneRecordChangeToken = changeToken
         }
 
         op.fetchRecordZoneChangesCompletionBlock = { (error) in
