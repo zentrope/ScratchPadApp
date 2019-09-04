@@ -14,8 +14,10 @@ class EditorViewController: NSViewController {
 
     private var page: Page
     private var store: Store
+    private var windowManager: WindowManager!
 
-    init(store: Store, page: Page) {
+    init(store: Store, page: Page, windowManager: WindowManager) {
+        self.windowManager = windowManager
         self.page = page
         self.store = store
         super.init(nibName: nil, bundle: nil)
@@ -79,7 +81,7 @@ extension EditorViewController: NSTextViewDelegate {
     @objc func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()
         if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).string {
-            WindowManager.shared.open(name: newPage)
+            windowManager?.open(name: newPage)
             let newRange = NSMakeRange(range.location, 0)
             editor.textView.setSelectedRange(newRange)
             render(editor.textView)
@@ -113,7 +115,7 @@ extension EditorViewController: NSTextViewDelegate {
         }
 
         if let selection = view.textStorage?.attributedSubstring(from: range).string {
-            if !WindowManager.shared.isValidLinkName(selection) {
+            if !windowManager.isValidLinkName(selection) {
                 return menu
             }
         }
@@ -126,8 +128,8 @@ extension EditorViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         guard let link = link as? String else { return false }
-        if WindowManager.shared.isScratchPadLink(link: link) {
-            WindowManager.shared.open(link: link)
+        if windowManager.isScratchPadLink(link: link) {
+            windowManager.open(link: link)
             return true
         }
         return false
@@ -140,7 +142,7 @@ extension EditorViewController: NSTextViewDelegate {
         // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
         source.removeAttribute(.link, range: NSMakeRange(0, source.length))
         for title in store.names {
-            let link = WindowManager.shared.makeLink(title)
+            let link = windowManager.makeLink(title)
             do {
                 try source.addLink(word: title, link: link)
             }

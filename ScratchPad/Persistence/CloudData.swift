@@ -23,26 +23,15 @@ class CloudData {
     static let zoneID = CKRecordZone.ID(zoneName: CloudData.zoneName, ownerName: CKCurrentUserDefaultName)
     static let privateSubscriptionID = "private-changes"
 
-    static let shared = CloudData()
-
     private var preferences: ScratchPadPrefs!
-    private var store: Store!
     private var database: Database!
 
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
 
-    init() {
-        self.privateDB = container.privateCloudDatabase
-        self.preferences = Preferences()
-        self.store = Store.shared
-        self.database = Database.main
-    }
-
-    init(preferences: ScratchPadPrefs, store: Store, database: Database) {
+    init(preferences: ScratchPadPrefs, database: Database) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
-        self.store = store
         self.database = database
     }
 
@@ -172,16 +161,16 @@ class CloudData {
         return recordAccount.record as? CKRecord
     }
 
-    private func notifyChanges(index: String) {
-        NotificationCenter.default.post(name: .cloudDataChanged, object: self, userInfo: ["page": index])
+    private func notifyChanges(record: CKRecord) {
+        // Using a notification for updates so that this class can remain decoupled from any local cache concerns.
+        NotificationCenter.default.post(name: .cloudDataChanged, object: self, userInfo: ["record": record])
     }
 
     // Called when CloudKit receives a new/update record from iCloud
     private func updateRecord(_ record: CKRecord) {
         let key = record.recordID.recordName.lowercased()
         setMetadata(forPageName: key, record: record)
-        store.replace(record: record)
-        notifyChanges(index: key)
+        notifyChanges(record: record)
         os_log("%{public}s", log: logger, "Processed a push update for '\(key)'.")
     }
 

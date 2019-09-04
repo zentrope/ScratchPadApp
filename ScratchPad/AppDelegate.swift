@@ -15,18 +15,33 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    private var windowManager: WindowManager!
+    private var cloudData: CloudData!
+    private var database: Database!
+    private var preferences: Preferences!
+    private var store: Store!
+
     private var isInitialized = false
 
     private func openMainWindow() {
-        os_log("%{public}s", log: logger, type: .debug, "open main window on main page")
-        if !isInitialized {
-            os_log("%{public}s", log: logger, type: .debug, "refusing to open main window until init complete")
-            return
+        if isInitialized {
+            windowManager.spawnMainPage()
         }
-        WindowManager.shared.spawnMainPage()
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        self.database = Database()
+        self.preferences = Preferences()
+        self.cloudData = CloudData(preferences: preferences, database: database)
+        self.store = Store(database: database, cloudData: cloudData)
+        self.windowManager = WindowManager(store: store)
+
+        NotificationCenter.default.addObserver(forName: .cloudDataChanged, object: nil, queue: .main) { [weak self] msg in
+            guard let uinfo = msg.userInfo, let record = uinfo["record"] as? CKRecord else { return }
+            self?.store.replace(record: record)
+        }
+
+        // For receiving a request to open a scratchpad URL.
         let manager = NSAppleEventManager.shared()
         manager.setEventHandler(self,
                                 andSelector: #selector(handle(_:withReplyEvent:)),
@@ -37,13 +52,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func handle(_ event: NSAppleEventDescriptor, withReplyEvent: NSAppleEventDescriptor) {
         guard let urlStr = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else { return }
         guard let link = urlStr.removingPercentEncoding else { return }
-        if WindowManager.shared.isScratchPadLink(link: link) {
-            WindowManager.shared.open(link: link)
+
+        if windowManager.isScratchPadLink(link: link) {
+            windowManager.open(link: link)
         }
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        CloudData.shared.setup() {
+        cloudData.setup() {
             NSApp.registerForRemoteNotifications()
             self.isInitialized = true
             self.openMainWindow()
@@ -91,7 +107,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let dict = userInfo as! [String:NSObject]
         guard let notification: CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else {
             return }
-        CloudData.shared.fetchChanges(in: notification.databaseScope) {
+        cloudData.fetchChanges(in: notification.databaseScope) {
             os_log("%{public}s", log: logger, "completed change fetches: sending notification")
         }
 

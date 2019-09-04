@@ -17,6 +17,7 @@ class EditorWindowController: NSWindowController {
     private var pageName: String
     private var saveName: NSWindow.FrameAutosaveName
     private var store: Store!
+    private var windowManager: WindowManager!
 
     private var isInspectorVisible: Bool = true {
         didSet {
@@ -27,13 +28,14 @@ class EditorWindowController: NSWindowController {
         }
     }
 
-    init(store: Store, page: Page) {
+    init(store: Store, page: Page, windowManager: WindowManager) {
+        self.windowManager = windowManager
         self.store = store
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
         self.pageName = page.name
         self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
-        self.controller = EditorViewController(store: store, page: page)
+        self.controller = EditorViewController(store: store, page: page, windowManager: windowManager)
 
         super.init(window: window)
 
@@ -65,6 +67,6 @@ extension EditorWindowController: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: saveName)
-        WindowManager.shared.close(forPageNamed: pageName)
+        windowManager.close(forPageNamed: pageName)
     }
 }

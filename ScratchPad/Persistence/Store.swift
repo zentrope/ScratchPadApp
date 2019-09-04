@@ -15,11 +15,10 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 
 class Store {
 
-    static let shared = Store()
-
     private let mainArticleIndex = "main"
 
     private var database: Database!
+    private var cloudData: CloudData!
 
     // Cache
     private var changes = Atomic(Set<String>())
@@ -31,13 +30,11 @@ class Store {
         }
     }
 
-    init() {
-        database = Database.main
-        scheduleChangeMonitor()
-    }
-
-    init(database: Database) {
+    init(database: Database, cloudData: CloudData) {
         self.database = database
+
+        // This dependency on cloud should be removed. Instead, AppDelegate should listen for change notifications on Core Data and call functions on the CloudData resource at that time.
+        self.cloudData = cloudData
         scheduleChangeMonitor()
     }
 
@@ -57,7 +54,6 @@ class Store {
         return newPage(name: index)
     }
 
-    
     func replace(record: CKRecord) {
         if let page = fromRecord(record: record) {
             database.saveContext()
@@ -95,7 +91,7 @@ class Store {
         }
 
         os_log("%{public}s", log: logger, type: .debug, "Scheduling pages: '\(pageNames)', for iCloud update.")
-        CloudData.shared.update(pages: pages) { names in
+        cloudData.update(pages: pages) { names in
             os_log("%{public}s", log: logger, type: .debug, "Pages updated: \(names.count).")
             self.changes.swap { $0.subtract(names) }
             self.scheduleChangeMonitor()
@@ -104,7 +100,7 @@ class Store {
 
     private func newPage(name: String) -> Page {
         let page = makePage(name: name)
-        CloudData.shared.create(page: page)
+        cloudData.create(page: page)
         return page
     }
 

@@ -14,7 +14,6 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 class WindowManager {
 
     static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
-    static let shared = WindowManager()
 
     private var windows = [String:EditorWindowController]()
 
@@ -22,10 +21,6 @@ class WindowManager {
 
     var count: Int {
         get { return windows.count }
-    }
-
-    init() {
-        self.store = Store.shared
     }
 
     init(store: Store) {
@@ -63,7 +58,7 @@ class WindowManager {
     }
 
     func spawn(_ page: Page) {
-        let c = EditorWindowController(store: store, page: page)
+        let c = EditorWindowController(store: store, page: page, windowManager: self)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.name] = c
     }
