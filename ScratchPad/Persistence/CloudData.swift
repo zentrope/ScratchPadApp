@@ -24,12 +24,12 @@ class CloudData {
     static let privateSubscriptionID = "private-changes"
 
     private var preferences: ScratchPadPrefs!
-    private var database: Database!
 
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
+    private let database: LocalDatabase
 
-    init(preferences: ScratchPadPrefs, database: Database) {
+    init(preferences: ScratchPadPrefs, database: LocalDatabase) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
         self.database = database
@@ -89,7 +89,7 @@ class CloudData {
             }
 
             if let record = savedRecord {
-                self.setMetadata(forPageName: page.name.lowercased(), record: record)
+                self.notifyMetadataUpdate(forPageName: page.name.lowercased(), record: record)
                 os_log("%{public}s", log: logger, "Saved '\(record.recordID.recordName)' to iCloud.")
             }
         }
@@ -138,7 +138,7 @@ class CloudData {
 
                 records.forEach { record in
                     let key = record.recordID.recordName.lowercased()
-                    self.setMetadata(forPageName: key, record: record)
+                    self.notifyMetadataUpdate(forPageName: key, record: record)
                 }
 
                 completion(indexes)
@@ -149,28 +149,31 @@ class CloudData {
 
     // MARK: - Convenience
 
-    private func setMetadata(forPageName name: String, record: CKRecord) {
-        let recordMetadata = database.makeRecordMetadataStub()
-        recordMetadata.name = name.lowercased()
-        recordMetadata.record = record
-        database.saveContext()
+    enum Event {
+        case updatePage(name: String, record: CKRecord)
+        case updateMetadata(name: String, record: CKRecord)
     }
 
+    var action: ((Event) -> Void)?
+
     private func getRecordFromMetadata(name: String) -> CKRecord? {
+        // How best to remove the need for database here?
         guard let recordAccount = database.fetchRecordMetadata(name: name) else { return nil }
         return recordAccount.record as? CKRecord
     }
 
-    private func notifyChanges(record: CKRecord) {
-        // Using a notification for updates so that this class can remain decoupled from any local cache concerns.
-        NotificationCenter.default.post(name: .cloudDataChanged, object: self, userInfo: ["record": record])
+    private func notifyPageUpdate(forPageName name: String, record: CKRecord) {
+        action?(.updatePage(name: name.lowercased(), record: record))
+    }
+
+    private func notifyMetadataUpdate(forPageName name: String, record: CKRecord) {
+        action?(.updateMetadata(name: name.lowercased(), record: record))
     }
 
     // Called when CloudKit receives a new/update record from iCloud
     private func updateRecord(_ record: CKRecord) {
         let key = record.recordID.recordName.lowercased()
-        setMetadata(forPageName: key, record: record)
-        notifyChanges(record: record)
+        notifyPageUpdate(forPageName: key, record: record)
         os_log("%{public}s", log: logger, "Processed a push update for '\(key)'.")
     }
 

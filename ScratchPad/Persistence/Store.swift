@@ -17,7 +17,7 @@ class Store {
 
     private let mainArticleIndex = "main"
 
-    private var database: Database!
+    private var database: LocalDatabase!
     private var cloudData: CloudData!
 
     // Cache
@@ -30,7 +30,7 @@ class Store {
         }
     }
 
-    init(database: Database, cloudData: CloudData) {
+    init(database: LocalDatabase, cloudData: CloudData) {
         self.database = database
 
         // This dependency on cloud should be removed. Instead, AppDelegate should listen for change notifications on Core Data and call functions on the CloudData resource at that time.
@@ -54,9 +54,15 @@ class Store {
         return newPage(name: index)
     }
 
-    func replace(record: CKRecord) {
+    func replace(metadata record: CKRecord) {
+        let recordMetadata = database.makeRecordMetadataStub()
+        recordMetadata.name = record.recordID.recordName.lowercased()
+        recordMetadata.record = record
+        database.saveContext()
+    }
+
+    func replace(page record: CKRecord) {
         if let page = fromRecord(record: record) {
-            database.saveContext()
             changes.swap { $0.remove(page.name.lowercased()) }
         }
     }
@@ -142,20 +148,33 @@ extension Store {
             return nil
         }
 
-        if let name = record["name"] as? String,
-            let dateCreated = record["dateCreated"] as? Date,
-            let dateUpdated = record["dateUpdated"] as? Date,
-            let body = NSAttributedString(rtf: data, documentAttributes: nil) {
-
-            let page = database.makePageStub()
-            page.name = name
-            page.dateCreated = dateCreated
-            page.dateUpdated = dateUpdated
-            page.body = body
-            return page
+        // Piece by piece to see what's missing. Also could iterate through CKRecord (if possible) to list attributes if we can't unpack them all.
+        guard let name = record["name"] as? String else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to find name of record.")
+            return nil
         }
 
-        os_log("%{public}s", log: logger, type: .error, "Unable to create a Page from a Record.")
-        return nil
+        guard let body = NSAttributedString(rtf: data, documentAttributes: nil) else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to create attributed string from body data.")
+            return nil
+        }
+
+        guard let dateUpdated = record["dateUpdated"] as? Date else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to find dateUpdated of record.")
+            return nil
+        }
+
+        guard let dateCreated = record["dateCreated"] as? Date else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to find dateCreated of record.")
+            print(record)
+            return nil
+        }
+
+        let page = database.makePageStub()
+        page.name = name
+        page.dateCreated = dateCreated
+        page.dateUpdated = dateUpdated
+        page.body = body
+        return page
     }
 }

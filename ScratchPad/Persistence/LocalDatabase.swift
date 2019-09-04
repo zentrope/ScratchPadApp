@@ -12,9 +12,9 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "Database")
 
-class Database {
+class LocalDatabase {
 
-    private var persistentContainer: NSPersistentContainer!
+    var persistentContainer: NSPersistentContainer!
 
     init() {
         persistentContainer = NSPersistentContainer(name: "ScratchPadModel")
@@ -24,21 +24,6 @@ class Database {
                 os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
             }
 
-        }
-        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: persistentContainer.viewContext, queue: .main) { msg in
-            print("Got change notification: Could do cloud notification stuff right here.")
-
-            guard let uinfo = msg.userInfo else { return }
-
-            if let updated = uinfo[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
-                print(" updated: \(updated.count)")
-            }
-            if let deleted = uinfo[NSDeletedObjectsKey] as? Set<NSManagedObject> {
-                print(" deleted: \(deleted.count)")
-            }
-            if let inserted = uinfo[NSInsertedObjectsKey] as? Set<NSManagedObject> {
-                print("inserted: \(inserted.count)")
-            }
         }
     }
 

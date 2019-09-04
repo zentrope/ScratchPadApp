@@ -53,7 +53,7 @@ public extension UserDefaults {
             let data = try NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)
             self.set(data, forKey: key)
         } catch {
-            print("ERROR: \(error)")
+            os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
             self.removeObject(forKey: key)
         }
     }

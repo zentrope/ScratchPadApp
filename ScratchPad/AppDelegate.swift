@@ -17,7 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var windowManager: WindowManager!
     private var cloudData: CloudData!
-    private var database: Database!
+    private var database: LocalDatabase!
     private var preferences: Preferences!
     private var store: Store!
 
@@ -30,15 +30,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        self.database = Database()
+        self.database = LocalDatabase()
         self.preferences = Preferences()
         self.cloudData = CloudData(preferences: preferences, database: database)
         self.store = Store(database: database, cloudData: cloudData)
         self.windowManager = WindowManager(store: store)
 
-        NotificationCenter.default.addObserver(forName: .cloudDataChanged, object: nil, queue: .main) { [weak self] msg in
-            guard let uinfo = msg.userInfo, let record = uinfo["record"] as? CKRecord else { return }
-            self?.store.replace(record: record)
+        cloudData.action = { [weak self] event in
+            switch event {
+            case let .updatePage(name: _, record: record):
+                self?.store.replace(page: record)
+            case let .updateMetadata(name: _, record: record):
+                self?.store.replace(metadata: record)
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: database.persistentContainer.viewContext, queue: .main) { msg in
+            print("Got change notification: Could do cloud notification stuff right here.")
+
+            guard let uinfo = msg.userInfo else { return }
+
+            if let updated = uinfo[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
+                print(" updated: \(updated.count)")
+            }
+            if let deleted = uinfo[NSDeletedObjectsKey] as? Set<NSManagedObject> {
+                print(" deleted: \(deleted.count)")
+            }
+            if let inserted = uinfo[NSInsertedObjectsKey] as? Set<NSManagedObject> {
+                print("inserted: \(inserted.count)")
+            }
         }
 
         // For receiving a request to open a scratchpad URL.
