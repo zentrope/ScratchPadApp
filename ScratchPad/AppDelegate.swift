@@ -33,6 +33,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let localDB = LocalDB(name: "ScratchPadModel")
         localDB.loadPersistentStores { (storeDescriotion, error) in
             localDB.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            do {
+                try localDB.viewContext.setQueryGenerationFrom(.current)
+            }
+            catch {
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
+            }
+            localDB.viewContext.automaticallyMergesChangesFromParent = true
             if let error = error {
                 os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
             }
@@ -80,7 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.isInitialized = true
             self.openMainWindow()
             NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: self.localDB.viewContext, queue: .main) { msg in
-                print("Core Data Change Notification: Could do cloud notification stuff right here.")
+                print("Core Data Change Notification: note changes, bg thread can send 'em later.")
 
                 guard let uinfo = msg.userInfo else { return }
 
