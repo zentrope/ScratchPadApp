@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14897.2" systemVersion="18G95" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Page" representedClassName="Page" syncable="YES">
+    <entity name="Page" representedClassName="PageMO" syncable="YES" codeGenerationType="class">
         <attribute name="body" attributeType="Transformable" customClassName="NSAttributedString"/>
         <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateUpdated" attributeType="Date" usesScalarValueType="NO"/>
@@ -11,9 +11,9 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
-    <entity name="RecordMetadata" representedClassName="RecordMetadata" syncable="YES" codeGenerationType="class">
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="record" optional="YES" attributeType="Transformable" valueTransformerName="CKMetadataValueTransformer"/>
+    <entity name="RecordMetadata" representedClassName="RecordMetadataMO" syncable="YES" codeGenerationType="class">
+        <attribute name="name" attributeType="String"/>
+        <attribute name="record" attributeType="Transformable" valueTransformerName="CKMetadataValueTransformer"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="name"/>
@@ -21,7 +21,7 @@
         </uniquenessConstraints>
     </entity>
     <elements>
-        <element name="Page" positionX="-63" positionY="-18" width="128" height="103"/>
+        <element name="Page" positionX="-247.7734375" positionY="-113.7578125" width="128" height="103"/>
         <element name="RecordMetadata" positionX="-63" positionY="9" width="128" height="73"/>
     </elements>
 </model>

@@ -12,11 +12,11 @@ class EditorViewController: NSViewController {
 
     private let editor = EditorTextView()
 
-    private var page: Page
+    private var page: PageValue
     private var store: Store
     private var windowManager: WindowManager!
 
-    init(store: Store, page: Page, windowManager: WindowManager) {
+    init(store: Store, page: PageValue, windowManager: WindowManager) {
         self.windowManager = windowManager
         self.page = page
         self.store = store
@@ -55,9 +55,8 @@ class EditorViewController: NSViewController {
         }
     }
 
-    private func updateText(_ string: NSAttributedString) {
-        page.body = string
-        store.update(page: page)
+    private func updateText(_ string: NSAttributedString) {        
+        store.update(page: page.name, withText: string)
     }
 
     private func reloadFromStore() {
@@ -80,7 +79,7 @@ extension EditorViewController: NSTextViewDelegate {
 
     @objc func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()
-        if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).string {
+        if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).rtfString {
             windowManager?.open(name: newPage)
             let newRange = NSMakeRange(range.location, 0)
             editor.textView.setSelectedRange(newRange)
@@ -114,7 +113,7 @@ extension EditorViewController: NSTextViewDelegate {
             return menu
         }
 
-        if let selection = view.textStorage?.attributedSubstring(from: range).string {
+        if let selection = view.textStorage?.attributedSubstring(from: range).rtfString {
             if !windowManager.isValidLinkName(selection) {
                 return menu
             }
@@ -159,19 +158,4 @@ extension EditorViewController: NSTextViewDelegate {
             updateText(textView.attributedString())
         }
     }
-}
-
-extension NSMutableAttributedString {
-
-    func addLink(word: String, link: String) throws {
-        let pattern = #"\b\#(word)\b"#
-        let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators, .caseInsensitive])
-
-        let matches = regex.matches(in: self.string, options: [], range: NSMakeRange(0, self.length))
-
-        matches.forEach { m in
-            self.addAttribute(.link, value: "\(link)", range: m.range)
-        }
-    }
-
 }

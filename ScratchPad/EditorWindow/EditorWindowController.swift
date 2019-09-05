@@ -28,7 +28,7 @@ class EditorWindowController: NSWindowController {
         }
     }
 
-    init(store: Store, page: Page, windowManager: WindowManager) {
+    init(store: Store, page: PageValue, windowManager: WindowManager) {
         self.windowManager = windowManager
         self.store = store
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)

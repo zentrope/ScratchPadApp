@@ -57,7 +57,7 @@ class WindowManager {
         spawn(store.mainPage())
     }
 
-    func spawn(_ page: Page) {
+    func spawn(_ page: PageValue) {
         let c = EditorWindowController(store: store, page: page, windowManager: self)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.name] = c

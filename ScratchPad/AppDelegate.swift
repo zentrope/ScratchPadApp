@@ -16,8 +16,8 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var windowManager: WindowManager!
-    private var cloudData: CloudData!
-    private var database: LocalDatabase!
+    private var cloudDB: CloudDB!
+    private var localDB: LocalDB!
     private var preferences: Preferences!
     private var store: Store!
 
@@ -29,35 +29,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private func makeLocalDB() -> LocalDB {
+        let localDB = LocalDB(name: "ScratchPadModel")
+        localDB.loadPersistentStores { (storeDescriotion, error) in
+            localDB.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            if let error = error {
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
+            }
+        }
+        return localDB
+    }
+
     func applicationWillFinishLaunching(_ notification: Notification) {
-        self.database = LocalDatabase()
+        self.localDB = makeLocalDB()
+
         self.preferences = Preferences()
-        self.cloudData = CloudData(preferences: preferences, database: database)
-        self.store = Store(database: database, cloudData: cloudData)
+        self.cloudDB = CloudDB(preferences: preferences, database: localDB)
+        self.store = Store(database: localDB, cloudData: cloudDB)
         self.windowManager = WindowManager(store: store)
 
-        cloudData.action = { [weak self] event in
+        cloudDB.action = { [weak self] event in
             switch event {
             case let .updatePage(name: _, record: record):
                 self?.store.replace(page: record)
             case let .updateMetadata(name: _, record: record):
                 self?.store.replace(metadata: record)
-            }
-        }
-
-        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: database.persistentContainer.viewContext, queue: .main) { msg in
-            print("Got change notification: Could do cloud notification stuff right here.")
-
-            guard let uinfo = msg.userInfo else { return }
-
-            if let updated = uinfo[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
-                print(" updated: \(updated.count)")
-            }
-            if let deleted = uinfo[NSDeletedObjectsKey] as? Set<NSManagedObject> {
-                print(" deleted: \(deleted.count)")
-            }
-            if let inserted = uinfo[NSInsertedObjectsKey] as? Set<NSManagedObject> {
-                print("inserted: \(inserted.count)")
             }
         }
 
@@ -79,10 +75,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        cloudData.setup() {
+        cloudDB.setup() {
             NSApp.registerForRemoteNotifications()
             self.isInitialized = true
             self.openMainWindow()
+            NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: self.localDB.viewContext, queue: .main) { msg in
+                print("Core Data Change Notification: Could do cloud notification stuff right here.")
+
+                guard let uinfo = msg.userInfo else { return }
+
+                if let updated = uinfo[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
+                    print(" updated: \(updated.count)")
+                }
+                if let deleted = uinfo[NSDeletedObjectsKey] as? Set<NSManagedObject> {
+                    print(" deleted: \(deleted.count)")
+                }
+                if let inserted = uinfo[NSInsertedObjectsKey] as? Set<NSManagedObject> {
+                    print("inserted: \(inserted.count)")
+                }
+            }
         }
     }
 
@@ -127,7 +138,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let dict = userInfo as! [String:NSObject]
         guard let notification: CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else {
             return }
-        cloudData.fetchChanges(in: notification.databaseScope) {
+        cloudDB.fetchChanges(in: notification.databaseScope) {
             os_log("%{public}s", log: logger, "completed change fetches: sending notification")
         }
 

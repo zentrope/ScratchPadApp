@@ -1,5 +1,5 @@
 //
-//  CloudData.swift
+//  CloudDB.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 8/30/19.
@@ -17,19 +17,19 @@ extension Notification.Name {
     static let cloudDataChanged = Notification.Name("cloudDataChanged")
 }
 
-class CloudData {
+class CloudDB {
 
     static let zoneName = "Pages"
-    static let zoneID = CKRecordZone.ID(zoneName: CloudData.zoneName, ownerName: CKCurrentUserDefaultName)
+    static let zoneID = CKRecordZone.ID(zoneName: CloudDB.zoneName, ownerName: CKCurrentUserDefaultName)
     static let privateSubscriptionID = "private-changes"
 
     private var preferences: ScratchPadPrefs!
 
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
-    private let database: LocalDatabase
+    private let database: LocalDB
 
-    init(preferences: ScratchPadPrefs, database: LocalDatabase) {
+    init(preferences: ScratchPadPrefs, database: LocalDB) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
         self.database = database
@@ -65,15 +65,15 @@ class CloudData {
         }
     }
 
-    func create(page: Page) {
-        guard let body = page.bodyString else {
+    func create(page: PageValue) {
+        guard let body = page.body.rtf else {
             os_log("%{public}s", log: logger, type: .error, "Unable to convert Page body to string.")
             return
         }
 
         let db = CKContainer.default().privateCloudDatabase
 
-        let id = CKRecord.ID(recordName: page.name, zoneID: CloudData.zoneID)
+        let id = CKRecord.ID(recordName: page.name, zoneID: CloudDB.zoneID)
         let type = "Page"
         let record = CKRecord(recordType: type, recordID: id)
 
@@ -95,7 +95,7 @@ class CloudData {
         }
     }
 
-    func update(pages: [Page], _ completion: @escaping (([String]) -> Void)) {
+    func update(pages: [PageValue], _ completion: @escaping (([String]) -> Void)) {
 
         let records: [CKRecord] = pages.compactMap { page in
             let key = page.name.lowercased()
@@ -104,17 +104,18 @@ class CloudData {
                 os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(page.name.lowercased())'")
 
                 // FIXME: This is not good. We need a way to figure out what's local only and sync it to the cloud.
-                create(page: page)
+                //create(page: page)
                 return nil
             }
 
-            guard let body = page.bodyString else {
+            guard let body = page.body.rtfString else {
                 os_log("%{public}s", log: logger, type: .error, "Unable to decode page body string")
                 return nil
             }
 
             update["name"] = page.name.lowercased()
-            update["dateUpdated"] = Date()
+            update["dateCreated"] = page.dateCreated
+            update["dateUpdated"] = page.dateUpdated
             update["body"] = body
             return update
         }
@@ -158,8 +159,8 @@ class CloudData {
 
     private func getRecordFromMetadata(name: String) -> CKRecord? {
         // How best to remove the need for database here?
-        guard let recordAccount = database.fetchRecordMetadata(name: name) else { return nil }
-        return recordAccount.record as? CKRecord
+        guard let meta = database.fetch(metadata: name) else { return nil }
+        return meta.record
     }
 
     private func notifyPageUpdate(forPageName name: String, record: CKRecord) {
@@ -276,15 +277,15 @@ class CloudData {
     // MARK: - Initialization
 
     private func createCustomZone() throws {
-        os_log("%{public}s", log: logger, "Create zone '\(CloudData.zoneName)' if necessary.")
+        os_log("%{public}s", log: logger, "Create zone '\(CloudDB.zoneName)' if necessary.")
         if preferences.isCustomZoneCreated {
-            os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneName)' already created.")
+            os_log("%{public}s", log: logger, "Zone '\(CloudDB.zoneName)' already created.")
             return
         }
 
         let lock = DispatchSemaphore(value: 0)
 
-        let zone = CKRecordZone(zoneID: CloudData.zoneID)
+        let zone = CKRecordZone(zoneID: CloudDB.zoneID)
 
         var error: Error?
 
@@ -302,7 +303,7 @@ class CloudData {
         if let error = error {
             throw error
         }
-        os_log("%{public}s", log: logger, "Zone '\(CloudData.zoneID.zoneName)' was created successfully.")
+        os_log("%{public}s", log: logger, "Zone '\(CloudDB.zoneID.zoneName)' was created successfully.")
         preferences.isCustomZoneCreated = true
     }
 
@@ -316,7 +317,7 @@ class CloudData {
         let lock = DispatchSemaphore(value: 0)
         var error: Error?
 
-        let op = makeSubscriptionOp(id: CloudData.privateSubscriptionID)
+        let op = makeSubscriptionOp(id: CloudDB.privateSubscriptionID)
 
         op.modifySubscriptionsCompletionBlock = { subscriptions, deleteIds, _error in
             defer { lock.signal() }
@@ -330,12 +331,12 @@ class CloudData {
         if let error = error {
             throw error
         }
-        os_log("%{public}s", log: logger, "Subscription '\(CloudData.privateSubscriptionID)' was successful.")
+        os_log("%{public}s", log: logger, "Subscription '\(CloudDB.privateSubscriptionID)' was successful.")
         preferences.isSubscribedToPrivateChanges = true
     }
 
     private func makeSubscriptionOp(id: String) -> CKModifySubscriptionsOperation {
-        let sub = CKDatabaseSubscription(subscriptionID: CloudData.privateSubscriptionID)
+        let sub = CKDatabaseSubscription(subscriptionID: CloudDB.privateSubscriptionID)
         let note = CKSubscription.NotificationInfo()
         note.shouldSendContentAvailable = true
         sub.notificationInfo = note
