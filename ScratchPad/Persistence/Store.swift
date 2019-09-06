@@ -53,11 +53,9 @@ class Store {
         localDB.upsert(record: record.recordID.recordName.lowercased(), withRecord: record)
     }
 
-    func replace(page record: CKRecord) {
-        if let page = PageValue.fromRecord(record: record) {
-            localDB.upsert(page: page)
-            changes.swap { $0.remove(page.name.lowercased()) }
-        }
+    func replace(pageNamed name: String, withRecord record: CKRecord) {
+        localDB.upsert(page: name, withRecord: record)
+        changes.swap { $0.remove(name.lowercased()) }
     }
 
     func update(page name: String, withText text: NSAttributedString) {
@@ -88,15 +86,37 @@ class Store {
         }
 
         os_log("%{public}s", log: logger, type: .debug, "Scheduling pages: '\(pageNames)', for iCloud update.")
-        cloudDB.update(pages: pages) { names in
-            os_log("%{public}s", log: logger, type: .debug, "Pages updated: \(names.count).")
+
+
+        cloudDB.update(pages: pages) { names, failures in
+            os_log("%{public}s", log: logger, type: .debug, "Pages update successes: \(names.count).")
+            os_log("%{public}s", log: logger, type: .debug, "Pages update failures: \(failures.count).")
             self.changes.swap { $0.subtract(names) }
+
+            // I think the reason for the failure matters: not found, or previous update? So should pair up an error.
+            for result in failures {
+                switch result.error {
+                case CloudDB.LocalCKError.NoMetadata:
+                    os_log("%{public}s", log: logger, type: .error, "\(result.page.name) no metadata on file")
+                    // could be we have a copy, but not posted, so try and retrieve it. If that succeeds, update, else create.
+                    break
+                case CKError.serverRecordChanged:
+                    os_log("%{public}s", log: logger, type: .error, "\(result.page.name) we have an out of date copy")
+                    // retrieve then update
+                    break
+                default:
+                    break
+                }
+                self.cloudDB.create(page: result.page)
+                self.changes.swap { $0.remove(result.page.name) } // Do this on success. Not sure what to do on failure to create. Same?
+            }
             self.scheduleChangeMonitor()
         }
     }
 
     private func newPage(name: String) -> PageValue {
         let page = makePage(name: name)
+        localDB.upsert(page: page)
         cloudDB.create(page: page)
         return page
     }
@@ -110,9 +130,6 @@ class Store {
         let message = name.lowercased() == mainArticleIndex.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
         let body = NSAttributedString(string: message, attributes: attrs)
 
-        let page = PageValue(name: name.lowercased(), dateCreated: Date(), dateUpdated: Date(), body: body)
-
-        localDB.upsert(page: page)
-        return page
+        return PageValue(name: name.lowercased(), dateCreated: Date(), dateUpdated: Date(), body: body)
     }
 }

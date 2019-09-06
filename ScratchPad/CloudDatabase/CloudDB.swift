@@ -65,7 +65,7 @@ class CloudDB {
     // Should take a completion handler.
     func create(page: PageValue) {
 
-        guard let body = page.body.rtf else {
+        guard let body: String = page.body.rtfString else {
             os_log("%{public}s", log: logger, type: .error, "Unable to convert Page body to string.")
             return
         }
@@ -94,7 +94,20 @@ class CloudDB {
         }
     }
 
-    func update(pages: [PageValue], _ completion: @escaping (([String]) -> Void)) {
+    enum LocalCKError : Error {
+        case NoMetadata
+    }
+
+    struct UpdateFailure {
+        var page: PageValue
+        var error: Error
+    }
+
+    func update(pages: [PageValue], _ completion: @escaping ((_ successes: [String], _ failures: [UpdateFailure]) -> Void)) {
+
+        let candidates = pages.reduce(into: [String:PageValue]()) { a, v in a[v.name] = v }
+
+        var failures = [UpdateFailure]()
 
         let records: [CKRecord] = pages.compactMap { page in
             let key = page.name.lowercased()
@@ -104,6 +117,7 @@ class CloudDB {
 
                 // FIXME: This is not good. We need a way to figure out what's local only and sync it to the cloud.
                 //create(page: page)
+                failures.append(UpdateFailure(page: page, error: LocalCKError.NoMetadata))
                 return nil
             }
 
@@ -121,12 +135,18 @@ class CloudDB {
 
         if records.isEmpty {
             os_log("%{public}s", log: logger, type: .debug, "None of the \(pages.count) record(s) submitted could be serialized.")
-            completion([String]())
+            completion([String](), failures)
             return
         }
 
         let op = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: [])
         op.savePolicy = .changedKeys
+        op.perRecordCompletionBlock = { record, error in
+            if let error = error {
+                failures.append(UpdateFailure(page: candidates[record.recordID.recordName]!, error: error))
+            }
+        }
+
         op.modifyRecordsCompletionBlock = { (savedRecords: [CKRecord]?, deletedIds, error) in
             if let error = error {
                 os_log("%{public}s", log: logger, type: .error, "\(error)")
@@ -141,7 +161,7 @@ class CloudDB {
                     self.notifyMetadataUpdate(forPageName: key, record: record)
                 }
 
-                completion(indexes)
+                completion(indexes, failures)
             }
         }
         privateDB.add(op)

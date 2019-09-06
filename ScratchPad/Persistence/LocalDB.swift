@@ -24,7 +24,7 @@ class LocalDB: NSPersistentContainer {
 
     func upsert(record name: String, withRecord record: CKRecord) {
         viewContext.performAndWait {
-            if var meta = fetch(metadata: name) {
+            if let meta = fetchMO(metadata: name) {
                 meta.record = record
                 saveContext()
                 return
@@ -36,6 +36,36 @@ class LocalDB: NSPersistentContainer {
         }
     }
 
+    func upsert(page name: String, withRecord record: CKRecord) {
+        viewContext.perform {
+            var meta: RecordMetadataMO
+            if let found = self.fetchMO(metadata: name) {
+                meta = found
+            } else {
+                meta = RecordMetadataMO(context: self.viewContext)
+                meta.name = name
+            }
+            meta.record = record
+
+            let page: PageMO
+            if let found = self.fetchMO(page: name) {
+                page = found
+            } else {
+                page = PageMO(context: self.viewContext)
+                page.name = name
+            }
+
+            if let value = PageValue.fromRecord(record: record) {
+                page.dateCreated = value.dateCreated
+                page.dateUpdated = value.dateUpdated
+                page.body = value.body
+                self.saveContext()
+            }
+        }
+    }
+
+    /// Update a page in the local cache.
+    /// - Parameter value: The page value containing the data to update
     func upsert(page value: PageValue) {
         viewContext.perform {
             var page: PageMO
@@ -48,6 +78,7 @@ class LocalDB: NSPersistentContainer {
             page.dateCreated = value.dateCreated
             page.dateUpdated = value.dateUpdated
             page.body = value.body
+
             self.saveContext()
         }
     }
@@ -58,6 +89,8 @@ class LocalDB: NSPersistentContainer {
                 page.body = body
                 page.dateUpdated = Date()
                 self.saveContext()
+            } else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to update text of page '\(name)'.")
             }
         }
     }

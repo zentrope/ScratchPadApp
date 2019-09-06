@@ -45,7 +45,7 @@ class WindowManager {
 
     func open(name: String) {
         if let win = windows[name] {
-            os_log("%{public}s", log: logger, type: .debug, "Making \(name) window key")
+            os_log("%{public}s", log: logger, type: .debug, "Making '\(name)' window key")
             win.window?.makeKeyAndOrderFront(self)
         } else {
             os_log("%{public}s", log: logger, type: .debug, "Spawning new '\(name)' window")
@@ -64,6 +64,7 @@ class WindowManager {
     }
 
     func close(forPageNamed name: String) {
+        os_log("%{public}s", log: logger, type: .debug, "Closing '\(name)' window.")
         windows.removeValue(forKey: name)
     }
 

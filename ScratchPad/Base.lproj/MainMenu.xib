@@ -636,6 +636,19 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Develop" id="F4t-Yc-Qsb">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Develop" id="aku-2F-hJx">
+                        <items>
+                            <menuItem title="Refresh All From Cloud" id="0r0-8A-chr">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="refreshAllFromCloud:" target="-1" id="NtS-cR-GyY"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Window" id="aUF-d1-5bR">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
