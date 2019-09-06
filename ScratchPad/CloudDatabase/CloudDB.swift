@@ -29,6 +29,13 @@ class CloudDB {
     private let privateDB: CKDatabase
     private let database: LocalDB
 
+    enum Event {
+        case updatePage(name: String, record: CKRecord)
+        case updateMetadata(name: String, record: CKRecord)
+    }
+
+    var action: ((Event) -> Void)?
+
     init(preferences: ScratchPadPrefs, database: LocalDB) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
@@ -55,17 +62,9 @@ class CloudDB {
         }
     }
 
-    func fetchChanges(in databaseScope: CKDatabase.Scope, completion: @escaping () -> Void) {
-        // Don't really need this scope stuff, do we?
-        switch databaseScope {
-        case .private:
-            fetchDatabaseChanges(database: privateDB, completion: completion)
-        default:
-            fatalError("Asked to fetch from scope we don't know about \(databaseScope)")
-        }
-    }
-
+    // Should take a completion handler.
     func create(page: PageValue) {
+
         guard let body = page.body.rtf else {
             os_log("%{public}s", log: logger, type: .error, "Unable to convert Page body to string.")
             return
@@ -148,14 +147,11 @@ class CloudDB {
         privateDB.add(op)
     }
 
-    // MARK: - Convenience
+}
 
-    enum Event {
-        case updatePage(name: String, record: CKRecord)
-        case updateMetadata(name: String, record: CKRecord)
-    }
+// MARK: - Convenience utility functions
 
-    var action: ((Event) -> Void)?
+extension CloudDB {
 
     private func getRecordFromMetadata(name: String) -> CKRecord? {
         // How best to remove the need for database here?
@@ -170,6 +166,24 @@ class CloudDB {
     private func notifyMetadataUpdate(forPageName name: String, record: CKRecord) {
         action?(.updateMetadata(name: name.lowercased(), record: record))
     }
+}
+
+// MARK: Fetching changes
+
+// Methods related to fetching changes on application start up, and when
+// a push notification arrives.
+
+extension CloudDB {
+
+    func fetchChanges(in databaseScope: CKDatabase.Scope, completion: @escaping () -> Void) {
+        // Don't really need this scope stuff, do we?
+        switch databaseScope {
+        case .private:
+            fetchDatabaseChanges(database: privateDB, completion: completion)
+        default:
+            fatalError("Asked to fetch from scope we don't know about \(databaseScope)")
+        }
+    }
 
     // Called when CloudKit receives a new/update record from iCloud
     private func updateRecord(_ record: CKRecord) {
@@ -177,8 +191,6 @@ class CloudDB {
         notifyPageUpdate(forPageName: key, record: record)
         os_log("%{public}s", log: logger, "Processed a push update for '\(key)'.")
     }
-
-    // MARK: - Fetch Changes
 
     private func fetchDatabaseChanges(database: CKDatabase, completion: @escaping () -> Void) {
 
@@ -215,6 +227,7 @@ class CloudDB {
             os_log("%{public}s", log: logger, type: .debug, "Saved database change token")
 
             if changedZoneIDs.isEmpty {
+                os_log("%{public}s", log: logger, type: .debug, "No zones were changed.")
                 completion()
                 return
             }
@@ -274,7 +287,11 @@ class CloudDB {
     }
 
 
-    // MARK: - Initialization
+}
+
+// MARK: - Initialization
+
+extension CloudDB {
 
     private func createCustomZone() throws {
         os_log("%{public}s", log: logger, "Create zone '\(CloudDB.zoneName)' if necessary.")

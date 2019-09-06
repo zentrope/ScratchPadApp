@@ -67,7 +67,6 @@
 			isa = PBXGroup;
 			children = (
 				538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */,
-				539A73F2231A34C1005E2788 /* CloudDB.swift */,
 				538F9749231E1BC8006D8734 /* LocalDB.swift */,
 				533FD2F52312091F00A0020E /* Store.swift */,
 				53DF04AD231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld */,
@@ -90,6 +89,14 @@
 				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		5385E93D2322207A00DDC8EB /* CloudDatabase */ = {
+			isa = PBXGroup;
+			children = (
+				539A73F2231A34C1005E2788 /* CloudDB.swift */,
+			);
+			path = CloudDatabase;
 			sourceTree = "<group>";
 		};
 		53BD45CF2311B60200712A61 /* EditorWindow */ = {
@@ -134,16 +141,17 @@
 				53054B22231B7A550063781E /* Atomic.swift */,
 				537B110F2318E47F00D49732 /* Preferences.swift */,
 				53490C90231253D300016DC2 /* WindowManager.swift */,
+				5385E93D2322207A00DDC8EB /* CloudDatabase */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
 				536457202320D41D006C1CFE /* Extensions */,
-				53EA43DF230F8A7D00019BE2 /* Metadata */,
 				536457192320BCD7006C1CFE /* Model */,
 				533EFEB8231B3005006F6B4C /* Persistence */,
+				53EA43DF230F8A7D00019BE2 /* Support Files */,
 			);
 			path = ScratchPad;
 			sourceTree = "<group>";
 		};
-		53EA43DF230F8A7D00019BE2 /* Metadata */ = {
+		53EA43DF230F8A7D00019BE2 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
 				53EA43D3230F85C800019BE2 /* MainMenu.xib */,
@@ -151,7 +159,7 @@
 				53EA43D6230F85C800019BE2 /* Info.plist */,
 				53EA43D7230F85C800019BE2 /* ScratchPad.entitlements */,
 			);
-			name = Metadata;
+			name = "Support Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -7,6 +7,9 @@
 //
 
 import Cocoa
+import os.log
+
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "EditorViewController")
 
 class EditorViewController: NSViewController {
 
@@ -75,11 +78,13 @@ extension NSMenu {
     }
 }
 
+// MARK: - NSTextViewDelegate
+
 extension EditorViewController: NSTextViewDelegate {
 
     @objc func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()
-        if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).rtfString {
+        if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).string {
             windowManager?.open(name: newPage)
             let newRange = NSMakeRange(range.location, 0)
             editor.textView.setSelectedRange(newRange)
@@ -113,7 +118,7 @@ extension EditorViewController: NSTextViewDelegate {
             return menu
         }
 
-        if let selection = view.textStorage?.attributedSubstring(from: range).rtfString {
+        if let selection = view.textStorage?.attributedSubstring(from: range).string {
             if !windowManager.isValidLinkName(selection) {
                 return menu
             }
@@ -147,7 +152,7 @@ extension EditorViewController: NSTextViewDelegate {
             }
 
             catch {
-                print("🔥 \(error)")
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
             }
         }
     }
