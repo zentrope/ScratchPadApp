@@ -25,6 +25,7 @@
 		53EA43D5230F85C800019BE2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 53EA43D3230F85C800019BE2 /* MainMenu.xib */; };
 		53EA43DE230F86C800019BE2 /* EditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53EA43DD230F86C800019BE2 /* EditorViewController.swift */; };
 		53EDDFD62311A94500E2FABB /* EditorTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53EDDFD52311A94500E2FABB /* EditorTextView.swift */; };
+		53FC14E323237B180034B9F1 /* PageUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FC14E223237B180034B9F1 /* PageUpdate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		53EA43D7230F85C800019BE2 /* ScratchPad.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ScratchPad.entitlements; sourceTree = "<group>"; };
 		53EA43DD230F86C800019BE2 /* EditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewController.swift; sourceTree = "<group>"; };
 		53EDDFD52311A94500E2FABB /* EditorTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTextView.swift; sourceTree = "<group>"; };
+		53FC14E223237B180034B9F1 /* PageUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageUpdate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 			children = (
 				5364571C2320BEE7006C1CFE /* MetadataValue.swift */,
 				5364571A2320BCFE006C1CFE /* PageValue.swift */,
+				53FC14E223237B180034B9F1 /* PageUpdate.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				53490C91231253D300016DC2 /* WindowManager.swift in Sources */,
 				53BD45CC2311B36500712A61 /* EditorWindowController.swift in Sources */,
 				53EA43DE230F86C800019BE2 /* EditorViewController.swift in Sources */,
+				53FC14E323237B180034B9F1 /* PageUpdate.swift in Sources */,
 				5364571D2320BEE7006C1CFE /* MetadataValue.swift in Sources */,
 				53054B23231B7A550063781E /* Atomic.swift in Sources */,
 				538F974A231E1BC8006D8734 /* LocalDB.swift in Sources */,

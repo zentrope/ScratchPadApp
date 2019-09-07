@@ -78,17 +78,17 @@ class Store {
             return
         }
 
-        var pages = [PageValue]()
+        var updates = [PageUpdate]()
         for name in pageNames {
             if let page = localDB.fetch(page: name) {
-                pages.append(page)
+                let meta = localDB.fetch(metadata: name)
+                updates.append(PageUpdate(page: page, metadata: meta))
             }
         }
 
         os_log("%{public}s", log: logger, type: .debug, "Scheduling pages: '\(pageNames)', for iCloud update.")
 
-
-        cloudDB.update(pages: pages) { names, failures in
+        cloudDB.update(pages: updates) { names, failures in
             os_log("%{public}s", log: logger, type: .debug, "Pages update successes: \(names.count).")
             os_log("%{public}s", log: logger, type: .debug, "Pages update failures: \(failures.count).")
             self.changes.swap { $0.subtract(names) }
@@ -96,7 +96,7 @@ class Store {
             // I think the reason for the failure matters: not found, or previous update? So should pair up an error.
             for result in failures {
                 switch result.error {
-                case CloudDB.LocalCKError.NoMetadata:
+                case CloudError.NoMetadata:
                     os_log("%{public}s", log: logger, type: .error, "\(result.page.name) no metadata on file")
                     // could be we have a copy, but not posted, so try and retrieve it. If that succeeds, update, else create.
                     break

@@ -17,6 +17,10 @@ extension Notification.Name {
     static let cloudDataChanged = Notification.Name("cloudDataChanged")
 }
 
+enum CloudError : Error {
+    case NoMetadata
+}
+
 class CloudDB {
 
     static let zoneName = "Pages"
@@ -27,7 +31,6 @@ class CloudDB {
 
     private let container = CKContainer.default()
     private let privateDB: CKDatabase
-    private let database: LocalDB
 
     enum Event {
         case updatePage(name: String, record: CKRecord)
@@ -36,10 +39,14 @@ class CloudDB {
 
     var action: ((Event) -> Void)?
 
-    init(preferences: ScratchPadPrefs, database: LocalDB) {
+    struct UpdateFailure {
+        var page: PageValue
+        var error: Error
+    }
+
+    init(preferences: ScratchPadPrefs) {
         self.privateDB = container.privateCloudDatabase
         self.preferences = preferences
-        self.database = database
     }
 
     func setup(_ completion: @escaping () -> Void) {
@@ -94,43 +101,30 @@ class CloudDB {
         }
     }
 
-    enum LocalCKError : Error {
-        case NoMetadata
-    }
+    func update(pages: [PageUpdate], _ completion: @escaping ((_ successes: [String], _ failures: [UpdateFailure]) -> Void)) {
 
-    struct UpdateFailure {
-        var page: PageValue
-        var error: Error
-    }
-
-    func update(pages: [PageValue], _ completion: @escaping ((_ successes: [String], _ failures: [UpdateFailure]) -> Void)) {
-
-        let candidates = pages.reduce(into: [String:PageValue]()) { a, v in a[v.name] = v }
+        let candidates = pages.reduce(into: [String:PageValue]()) { a, v in a[v.page.name] = v.page }
 
         var failures = [UpdateFailure]()
 
-        let records: [CKRecord] = pages.compactMap { page in
-            let key = page.name.lowercased()
+        let records: [CKRecord] = pages.compactMap { update in
 
-            guard let update = self.getRecordFromMetadata(name: key) else {
-                os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(page.name.lowercased())'")
-
-                // FIXME: This is not good. We need a way to figure out what's local only and sync it to the cloud.
-                //create(page: page)
-                failures.append(UpdateFailure(page: page, error: LocalCKError.NoMetadata))
+            guard let record = update.metadata?.record else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to get metadata for '\(update.page.name)'.")
+                failures.append(UpdateFailure(page: update.page, error: CloudError.NoMetadata))
                 return nil
             }
 
-            guard let body = page.body.rtfString else {
+            guard let body = update.page.body.rtfString else {
                 os_log("%{public}s", log: logger, type: .error, "Unable to decode page body string")
                 return nil
             }
 
-            update["name"] = page.name.lowercased()
-            update["dateCreated"] = page.dateCreated
-            update["dateUpdated"] = page.dateUpdated
-            update["body"] = body
-            return update
+            record["name"] = update.page.name
+            record["dateCreated"] = update.page.dateCreated
+            record["dateUpdated"] = update.page.dateUpdated
+            record["body"] = body
+            return record
         }
 
         if records.isEmpty {
@@ -172,12 +166,6 @@ class CloudDB {
 // MARK: - Convenience utility functions
 
 extension CloudDB {
-
-    private func getRecordFromMetadata(name: String) -> CKRecord? {
-        // How best to remove the need for database here?
-        guard let meta = database.fetch(metadata: name) else { return nil }
-        return meta.record
-    }
 
     private func notifyPageUpdate(forPageName name: String, record: CKRecord) {
         action?(.updatePage(name: name.lowercased(), record: record))

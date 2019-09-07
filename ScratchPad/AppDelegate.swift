@@ -92,7 +92,7 @@ extension AppDelegate {
     private func initAndConfigure() {
         self.localDB = makeLocalDB()
         self.preferences = Preferences()
-        self.cloudDB = CloudDB(preferences: preferences, database: localDB)
+        self.cloudDB = CloudDB(preferences: preferences)
         self.store = Store(database: localDB, cloudData: cloudDB)
         self.windowManager = WindowManager(store: store)
 
