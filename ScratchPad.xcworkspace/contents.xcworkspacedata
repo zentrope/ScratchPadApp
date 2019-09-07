@@ -2,12 +2,22 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:ScratchPad.xcodeproj">
+   </FileRef>
+   <Group
+      location = "group:Support"
+      name = "Support">
+      <FileRef
+         location = "group:To Do.ooutline">
+      </FileRef>
+      <FileRef
+         location = "group:ScratchPad Icon.afdesign">
+      </FileRef>
+   </Group>
+   <FileRef
       location = "group:readme.md">
    </FileRef>
    <FileRef
-      location = "group:To Do.ooutline">
-   </FileRef>
-   <FileRef
-      location = "group:ScratchPad.xcodeproj">
+      location = "group:LICENSE">
    </FileRef>
 </Workspace>
