@@ -11,7 +11,7 @@ import CoreData
 import CloudKit
 import os.log
 
-fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "Database")
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "LocalDB")
 
 
 /// A class for interacting with the local data store.
@@ -20,19 +20,35 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 ///
 class LocalDB: NSPersistentContainer {
 
+    // We can't override init(name: String) because it's a convenience method
+    // on the superclass.
+    static func instantiate(name: String) -> LocalDB {
+        let localDB = LocalDB(name: name)
+        localDB.loadPersistentStores { (storeDescriotion, error) in
+            localDB.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            // rem: query generations
+            // rem: automaticallyMergesChangesFromParent
+            if let error = error {
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
+                fatalError(error.localizedDescription)
+            }
+        }
+        return localDB
+    }
+
     // MARK: - Mutations
 
     func upsert(record name: String, withRecord record: CKRecord) {
         viewContext.performAndWait {
             if let meta = fetchMO(metadata: name) {
                 meta.record = record
-                saveContext()
+                commit()
                 return
             }
             let meta = RecordMetadataMO(context: viewContext)
             meta.name = name
             meta.record = record
-            saveContext()
+            commit()
         }
     }
 
@@ -59,7 +75,7 @@ class LocalDB: NSPersistentContainer {
                 page.dateCreated = value.dateCreated
                 page.dateUpdated = value.dateUpdated
                 page.body = value.body
-                self.saveContext()
+                self.commit()
             }
         }
     }
@@ -79,7 +95,7 @@ class LocalDB: NSPersistentContainer {
             page.dateUpdated = value.dateUpdated
             page.body = value.body
 
-            self.saveContext()
+            self.commit()
         }
     }
 
@@ -88,7 +104,7 @@ class LocalDB: NSPersistentContainer {
             if let page = self.fetchMO(page: name) {
                 page.body = body
                 page.dateUpdated = Date()
-                self.saveContext()
+                self.commit()
             } else {
                 os_log("%{public}s", log: logger, type: .error, "Unable to update text of page '\(name)'.")
             }
@@ -167,7 +183,7 @@ class LocalDB: NSPersistentContainer {
         return result
     }
 
-    private func saveContext() {
+    private func commit() {
         guard viewContext.hasChanges else { return }
         viewContext.perform {
             do {

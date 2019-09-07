@@ -90,11 +90,11 @@ extension AppDelegate {
 extension AppDelegate {
 
     private func initAndConfigure() {
-        self.localDB = makeLocalDB()
-        self.preferences = Preferences()
-        self.cloudDB = CloudDB(preferences: preferences)
-        self.broker = DataBroker(database: localDB, cloudData: cloudDB)
-        self.windowManager = WindowManager(broker: broker)
+        localDB = LocalDB.instantiate(name: coreDataModelName)
+        preferences = Preferences()
+        cloudDB = CloudDB(preferences: preferences)
+        broker = DataBroker(database: localDB, cloudData: cloudDB)
+        windowManager = WindowManager(broker: broker)
 
         cloudDB.action = { [weak self] event in
             switch event {
@@ -142,28 +142,6 @@ extension AppDelegate {
         if noVisibleWindows() {
             openMainWindow()
         }
-    }
-
-    private func makeLocalDB() -> LocalDB {
-        let localDB = LocalDB(name: coreDataModelName)
-        localDB.loadPersistentStores { (storeDescriotion, error) in
-            localDB.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-
-            // The following is probably useful if there are a lot of updates in the background.
-            // do {
-            //     try localDB.viewContext.setQueryGenerationFrom(.current)
-            // }
-            // catch {
-            //     os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
-            // }
-            // localDB.viewContext.automaticallyMergesChangesFromParent = true
-
-            if let error = error {
-                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
-                fatalError(error.localizedDescription)
-            }
-        }
-        return localDB
     }
 
     private func registerForCoreDataChanges() {

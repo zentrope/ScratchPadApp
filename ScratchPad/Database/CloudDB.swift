@@ -11,7 +11,7 @@ import CloudKit
 import CoreData
 import os.log
 
-fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "CloudData")
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "CloudDB")
 
 extension Notification.Name {
     static let cloudDataChanged = Notification.Name("cloudDataChanged")
@@ -215,7 +215,7 @@ extension CloudDB {
 
         op.recordZoneWithIDWasDeletedBlock = { zoneID in
             // If this mattered to us, delete all the data associated with that zone.
-            print("Zone \(zoneID) was deleted.")
+            os_log("%{public}s", log: logger, "Zone '\(zoneID.zoneName)' was deleted.")
             self.preferences.isSubscribedToPrivateChanges = false
             self.preferences.isCustomZoneCreated = false
         }
