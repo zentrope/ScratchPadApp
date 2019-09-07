@@ -9,6 +9,6 @@
 import Foundation
 
 struct PageUpdate {
-    var page: PageValue
-    var metadata: MetadataValue?
+    var page: Page
+    var metadata: RecordMetadata?
 }

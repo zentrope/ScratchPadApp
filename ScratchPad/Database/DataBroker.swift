@@ -8,7 +8,6 @@
 
 import Cocoa
 import CloudKit
-import CoreData
 
 import os.log
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "DataBroker")
@@ -38,11 +37,11 @@ class DataBroker {
     }
 
     /// Return the main/initial article
-    func mainPage() -> PageValue {
+    func mainPage() -> Page {
         return find(index: mainArticleIndex)
     }
 
-    func find(index: String) -> PageValue {
+    func find(index: String) -> Page {
         if let page = localDB.fetch(page: index) {
             return page
         }
@@ -114,14 +113,14 @@ class DataBroker {
         }
     }
 
-    private func newPage(name: String) -> PageValue {
+    private func newPage(name: String) -> Page {
         let page = makePage(name: name)
         localDB.upsert(page: page)
         cloudDB.create(page: page)
         return page
     }
 
-    private func makePage(name: String) -> PageValue {
+    private func makePage(name: String) -> Page {
         let attrs: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 16.0),
             .foregroundColor: NSColor.controlTextColor
@@ -130,6 +129,6 @@ class DataBroker {
         let message = name.lowercased() == mainArticleIndex.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
         let body = NSAttributedString(string: message, attributes: attrs)
 
-        return PageValue(name: name.lowercased(), dateCreated: Date(), dateUpdated: Date(), body: body)
+        return Page(name: name.lowercased(), dateCreated: Date(), dateUpdated: Date(), body: body)
     }
 }

@@ -8,7 +8,6 @@
 
 import Foundation
 import CloudKit
-import CoreData
 import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "CloudDB")
@@ -40,7 +39,7 @@ class CloudDB {
     var action: ((Event) -> Void)?
 
     struct UpdateFailure {
-        var page: PageValue
+        var page: Page
         var error: Error
     }
 
@@ -70,7 +69,7 @@ class CloudDB {
     }
 
     // Should take a completion handler.
-    func create(page: PageValue) {
+    func create(page: Page) {
 
         guard let body: String = page.body.rtfString else {
             os_log("%{public}s", log: logger, type: .error, "Unable to convert Page body to string.")
@@ -103,7 +102,7 @@ class CloudDB {
 
     func update(pages: [PageUpdate], _ completion: @escaping ((_ successes: [String], _ failures: [UpdateFailure]) -> Void)) {
 
-        let candidates = pages.reduce(into: [String:PageValue]()) { a, v in a[v.page.name] = v.page }
+        let candidates = pages.reduce(into: [String:Page]()) { a, v in a[v.page.name] = v.page }
 
         var failures = [UpdateFailure]()
 
@@ -369,5 +368,49 @@ extension CloudDB {
         let op = CKModifySubscriptionsOperation(subscriptionsToSave: [sub], subscriptionIDsToDelete: [])
         op.qualityOfService = .utility
         return op
+    }
+}
+
+extension Page {
+
+    static func fromRecord(record: CKRecord) -> Page? {
+
+        guard let rtfString = record["body"] as? String else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to retrieve record's body.")
+            return nil
+        }
+
+        guard let data = rtfString.data(using: .utf8) else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to convert rtf string to data")
+            return nil
+        }
+
+        guard let body = NSAttributedString(rtf: data, documentAttributes: nil) else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to create attributed string from body data.")
+            return nil
+        }
+
+        guard let dateCreated = record["dateCreated"] as? Date else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to retrieve date created from record.")
+            return nil
+        }
+
+        guard let dateUpdated = record["dateUpdated"] as? Date else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to retrieve date updated from record.")
+            return nil
+        }
+
+        guard let name = record["name"] as? String else {
+            os_log("%{public}s", log: logger, type: .error, "Unable to retrieve name from record.")
+            return nil
+        }
+
+        let page = Page(
+            name: name,
+            dateCreated: dateCreated,
+            dateUpdated: dateUpdated,
+            body: body
+        )
+        return page
     }
 }

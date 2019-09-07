@@ -28,7 +28,7 @@ class EditorWindowController: NSWindowController {
         }
     }
 
-    init(broker: DataBroker, page: PageValue, windowManager: WindowManager) {
+    init(broker: DataBroker, page: Page, windowManager: WindowManager) {
         self.windowManager = windowManager
         self.broker = broker
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)

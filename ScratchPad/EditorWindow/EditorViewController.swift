@@ -15,11 +15,11 @@ class EditorViewController: NSViewController {
 
     private let editor = EditorTextView()
 
-    private var page: PageValue
+    private var page: Page
     private var broker: DataBroker
     private var windowManager: WindowManager!
 
-    init(broker: DataBroker, page: PageValue, windowManager: WindowManager) {
+    init(broker: DataBroker, page: Page, windowManager: WindowManager) {
         self.windowManager = windowManager
         self.page = page
         self.broker = broker

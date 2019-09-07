@@ -13,6 +13,25 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "LocalDB")
 
+extension Page {
+    static func fromManagedObject(page: PageMO) -> Page {
+        return Page(
+            name: page.name ?? "unknown",
+            dateCreated: page.dateCreated ?? Date(),
+            dateUpdated: page.dateUpdated ?? Date(),
+            body: page.body ?? NSAttributedString()
+        )
+    }
+}
+
+extension RecordMetadata {
+    static func fromManagedObject(metadata: RecordMetadataMO) -> RecordMetadata {
+        let name = metadata.name!
+        let record = metadata.record as! CKRecord
+        return RecordMetadata(name: name, record: record)
+    }
+}
+
 
 /// A class for interacting with the local data store.
 ///
@@ -71,7 +90,7 @@ class LocalDB: NSPersistentContainer {
                 page.name = name
             }
 
-            if let value = PageValue.fromRecord(record: record) {
+            if let value = Page.fromRecord(record: record) {
                 page.dateCreated = value.dateCreated
                 page.dateUpdated = value.dateUpdated
                 page.body = value.body
@@ -82,7 +101,7 @@ class LocalDB: NSPersistentContainer {
 
     /// Update a page in the local cache.
     /// - Parameter value: The page value containing the data to update
-    func upsert(page value: PageValue) {
+    func upsert(page value: Page) {
         viewContext.perform {
             var page: PageMO
             if let oldPage = self.fetchMO(page: value.name) {
@@ -127,23 +146,23 @@ class LocalDB: NSPersistentContainer {
         return result
     }
 
-    func fetch(metadata name: String) -> MetadataValue? {
-        var result: MetadataValue?
+    func fetch(metadata name: String) -> RecordMetadata? {
+        var result: RecordMetadata?
 
         viewContext.performAndWait {
             if let meta = fetchMO(metadata: name) {
-                result = MetadataValue.fromManagedObject(metadata: meta)
+                result = RecordMetadata.fromManagedObject(metadata: meta)
             }
         }
 
         return result
     }
 
-    func fetch(page name: String) -> PageValue? {
-        var result: PageValue?
+    func fetch(page name: String) -> Page? {
+        var result: Page?
         viewContext.performAndWait {
             if let page: PageMO = fetchMO(page: name) {
-                result = PageValue.fromManagedObject(page: page)
+                result = Page.fromManagedObject(page: page)
             }
         }
         return result
