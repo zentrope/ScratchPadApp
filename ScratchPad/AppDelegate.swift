@@ -15,6 +15,9 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    private var statusBar = NSStatusBar.system
+    private var statusBarItem = NSStatusItem()
+
     private let coreDataModelName = "ScratchPadModel"
 
     private var windowManager: WindowManager!
@@ -25,6 +28,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var isInitialized = false
 
+    private func makeStatusBarItem() {
+        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength )
+        if let button = statusBarItem.button {
+            button.image = NSImage(named: "skew")?.scaled(toHeight: 17)
+            button.imageScaling = .scaleProportionallyDown
+            button.target = self
+            button.action = #selector(openMainWindow)
+        }
+    }
+
+    // MARK: - NSApplicationDelegate
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         initAndConfigure()
@@ -35,6 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         cloudDB.setup() {
             NSApp.registerForRemoteNotifications()
             self.isInitialized = true
+            self.makeStatusBarItem()
             self.openMainWindow()
             //self.registerForCoreDataChanges()
         }
@@ -123,7 +138,7 @@ extension AppDelegate {
         }
     }
 
-    private func openMainWindow() {
+    @objc private func openMainWindow() {
         if isInitialized {
             windowManager.spawnMainPage()
         }

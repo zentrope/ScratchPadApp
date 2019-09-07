@@ -53,8 +53,16 @@ class WindowManager {
         }
     }
 
+    func open(page: Page) {
+        if let win = windows[page.name] {
+            win.window?.makeKeyAndOrderFront(self)
+        } else {
+            spawn(page)
+        }
+    }
+
     func spawnMainPage() {
-        spawn(broker.mainPage())
+        open(page: broker.mainPage())
     }
 
     func spawn(_ page: Page) {
