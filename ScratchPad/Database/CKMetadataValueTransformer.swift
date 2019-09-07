@@ -17,7 +17,7 @@ class CKMetadataValueTransformer: ValueTransformer {
     }
 
     override class func allowsReverseTransformation() -> Bool {
-        return false
+        return true
     }
 
     override func transformedValue(_ value: Any?) -> Any? {
