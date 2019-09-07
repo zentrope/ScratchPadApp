@@ -71,7 +71,16 @@ class WindowManager {
         windows[page.name] = c
     }
 
-    func close(forPageNamed name: String) {
+    func closeAll() {
+        for (name, _) in windows {
+            if let win = windows[name] {
+                win.close()
+            }
+            //close(pageNamed: name)
+        }
+    }
+
+    func close(pageNamed name: String) {
         os_log("%{public}s", log: logger, type: .debug, "Closing '\(name)' window.")
         windows.removeValue(forKey: name)
     }

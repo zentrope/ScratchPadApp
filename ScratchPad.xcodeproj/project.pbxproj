@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		53054B23231B7A550063781E /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53054B22231B7A550063781E /* Atomic.swift */; };
 		5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94223242B7700504A5B /* NSImage+Extension.swift */; };
+		5318C94523243CE700504A5B /* NSMenuItem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */; };
 		533FD2F62312091F00A0020E /* DataBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* DataBroker.swift */; };
 		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
 		5364571B2320BCFE006C1CFE /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571A2320BCFE006C1CFE /* Page.swift */; };
@@ -32,6 +33,7 @@
 /* Begin PBXFileReference section */
 		53054B22231B7A550063781E /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
 		5318C94223242B7700504A5B /* NSImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Extension.swift"; sourceTree = "<group>"; };
+		5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Extension.swift"; sourceTree = "<group>"; };
 		533FD2F52312091F00A0020E /* DataBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBroker.swift; sourceTree = "<group>"; };
 		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
 		5364571A2320BCFE006C1CFE /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 			children = (
 				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
 				5318C94223242B7700504A5B /* NSImage+Extension.swift */,
+				5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -246,6 +249,7 @@
 				5364571D2320BEE7006C1CFE /* RecordMetadata.swift in Sources */,
 				53054B23231B7A550063781E /* Atomic.swift in Sources */,
 				538F974A231E1BC8006D8734 /* LocalDB.swift in Sources */,
+				5318C94523243CE700504A5B /* NSMenuItem+Extension.swift in Sources */,
 				538F9748231E1534006D8734 /* CKMetadataValueTransformer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

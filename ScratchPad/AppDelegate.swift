@@ -15,7 +15,6 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    private var statusBar = NSStatusBar.system
     private var statusBarItem = NSStatusItem()
 
     private let coreDataModelName = "ScratchPadModel"
@@ -27,16 +26,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var broker: DataBroker!
 
     private var isInitialized = false
-
-    private func makeStatusBarItem() {
-        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength )
-        if let button = statusBarItem.button {
-            button.image = NSImage(named: "skew")?.scaled(toHeight: 17)
-            button.imageScaling = .scaleProportionallyDown
-            button.target = self
-            button.action = #selector(openMainWindow)
-        }
-    }
 
     // MARK: - NSApplicationDelegate
 
@@ -73,6 +62,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         os_log("%{public}s", log: logger, "received a remote device token")
     }
 
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        return makeHelperMenu()
+    }
+
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String : Any]) {
         os_log("%{public}s", log: logger, "Received a remote notification about an iCloud update.")
         let dict = userInfo as! [String:NSObject]
@@ -96,6 +89,68 @@ extension AppDelegate {
         cloudDB.fetchChanges(in: .private) {
             os_log("%{public}s", log: logger, "Develop menu: refreshAllFromCloud completed.")
             NotificationCenter.default.post(name: .cloudDataChanged, object: self)
+        }
+    }
+}
+
+// MARK: - Auxiliary Menu Concerns
+
+extension AppDelegate {
+
+    private func makeStatusBarItem() {
+        statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength )
+        if let button = statusBarItem.button {
+            button.image = NSImage(named: "skew")?.scaled(toHeight: 17)
+            button.imageScaling = .scaleProportionallyDown
+        }
+        statusBarItem.menu = makeHelperMenu(includeQuit: true)
+    }
+
+    private func makeHelperMenu(includeQuit: Bool = false) -> NSMenu {
+        let openMain = NSMenuItem(title: "Open Main ScratchPad", action: #selector(statusBarMenuSelected), keyEquivalent: "", tag: 1001)
+
+        let scratchPadSelector = NSMenuItem(title: "ScratchPads", action: nil, keyEquivalent: "")
+
+        let padMenus = localDB.fetchNames().sorted().enumerated().map { index, name in
+            NSMenuItem(title: name, action: #selector(statusBarMenuSelected(_:)), keyEquivalent: "", tag: 2001 + index)
+        }
+
+        let closeAll = NSMenuItem(title: "Close All ScratchPads", action: #selector(statusBarMenuSelected(_:)), keyEquivalent: "", tag: 3001)
+
+        let quit = NSMenuItem(title: "Quit", action: #selector(statusBarMenuSelected(_:)), keyEquivalent: "q", tag: 9001)
+
+        let menu = NSMenu()
+        menu.addItem(openMain)
+        menu.addItem(.separator())
+        menu.addItem(scratchPadSelector)
+        for padMenu in padMenus {
+            menu.addItem(padMenu)
+        }
+        menu.addItem(.separator())
+        menu.addItem(closeAll)
+        if includeQuit {
+            menu.addItem(.separator())
+            menu.addItem(quit)
+        }
+        return menu
+    }
+
+    @objc private func statusBarMenuSelected(_ sender: NSMenuItem) {
+        switch sender.tag {
+        case 1001:
+            openMainWindow()
+        case 2001..<3001:
+            let pageName = sender.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if localDB.exists(pageNamed: pageName) {
+                windowManager.open(name: pageName)
+            }
+        case 3001:
+            windowManager.closeAll()
+        case 9001:
+            NSApp.activate(ignoringOtherApps: true)
+            NSApp.terminate(self)
+        default:
+            break
         }
     }
 }

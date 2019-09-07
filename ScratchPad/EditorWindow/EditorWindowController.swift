@@ -67,6 +67,6 @@ extension EditorWindowController: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: saveName)
-        windowManager.close(forPageNamed: pageName)
+        windowManager.close(pageNamed: pageName)
     }
 }

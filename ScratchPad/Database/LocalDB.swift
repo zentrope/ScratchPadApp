@@ -132,6 +132,14 @@ class LocalDB: NSPersistentContainer {
 
     // MARK: - Queries
 
+    func exists(pageNamed name: String) -> Bool {
+        var result = false
+        viewContext.performAndWait {
+            result = fetchMO(page: name) != nil
+        }
+        return result
+    }
+
     func fetchNames() -> [String] {
         var result = [String]()
         viewContext.performAndWait {
