@@ -16,7 +16,7 @@ class EditorWindowController: NSWindowController {
     private var controller: EditorViewController
     private var pageName: String
     private var saveName: NSWindow.FrameAutosaveName
-    private var store: Store!
+    private var broker: DataBroker!
     private var windowManager: WindowManager!
 
     private var isInspectorVisible: Bool = true {
@@ -28,14 +28,14 @@ class EditorWindowController: NSWindowController {
         }
     }
 
-    init(store: Store, page: PageValue, windowManager: WindowManager) {
+    init(broker: DataBroker, page: PageValue, windowManager: WindowManager) {
         self.windowManager = windowManager
-        self.store = store
+        self.broker = broker
         let window = NSWindow(contentRect: .zero, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
         self.pageName = page.name
         self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
-        self.controller = EditorViewController(store: store, page: page, windowManager: windowManager)
+        self.controller = EditorViewController(broker: broker, page: page, windowManager: windowManager)
 
         super.init(window: window)
 

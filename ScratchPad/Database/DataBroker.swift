@@ -1,5 +1,5 @@
 //
-//  Store.swift
+//  DataBroker.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 8/24/19.
@@ -11,9 +11,9 @@ import CloudKit
 import CoreData
 
 import os.log
-fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "Store")
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "DataBroker")
 
-class Store {
+class DataBroker {
 
     private let mainArticleIndex = "main"
 

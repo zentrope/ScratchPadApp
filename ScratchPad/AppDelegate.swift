@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var cloudDB: CloudDB!
     private var localDB: LocalDB!
     private var preferences: Preferences!
-    private var store: Store!
+    private var broker: DataBroker!
 
     private var isInitialized = false
 
@@ -93,15 +93,15 @@ extension AppDelegate {
         self.localDB = makeLocalDB()
         self.preferences = Preferences()
         self.cloudDB = CloudDB(preferences: preferences)
-        self.store = Store(database: localDB, cloudData: cloudDB)
-        self.windowManager = WindowManager(store: store)
+        self.broker = DataBroker(database: localDB, cloudData: cloudDB)
+        self.windowManager = WindowManager(broker: broker)
 
         cloudDB.action = { [weak self] event in
             switch event {
             case let .updatePage(name: name, record: record):
-                self?.store.replace(pageNamed: name, withRecord: record)
+                self?.broker.replace(pageNamed: name, withRecord: record)
             case let .updateMetadata(name: _, record: record):
-                self?.store.replace(metadata: record)
+                self?.broker.replace(metadata: record)
             }
         }
     }

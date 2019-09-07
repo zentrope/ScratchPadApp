@@ -17,14 +17,14 @@ class WindowManager {
 
     private var windows = [String:EditorWindowController]()
 
-    private var store: Store
+    private var broker: DataBroker
 
     var count: Int {
         get { return windows.count }
     }
 
-    init(store: Store) {
-        self.store = store
+    init(broker: DataBroker) {
+        self.broker = broker
     }
 
     func isScratchPadLink(link: String) -> Bool {
@@ -49,16 +49,16 @@ class WindowManager {
             win.window?.makeKeyAndOrderFront(self)
         } else {
             os_log("%{public}s", log: logger, type: .debug, "Spawning new '\(name)' window")
-            spawn(store.find(index: name))
+            spawn(broker.find(index: name))
         }
     }
 
     func spawnMainPage() {
-        spawn(store.mainPage())
+        spawn(broker.mainPage())
     }
 
     func spawn(_ page: PageValue) {
-        let c = EditorWindowController(store: store, page: page, windowManager: self)
+        let c = EditorWindowController(broker: broker, page: page, windowManager: self)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.name] = c
     }

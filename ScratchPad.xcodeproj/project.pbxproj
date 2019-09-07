@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		53054B23231B7A550063781E /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53054B22231B7A550063781E /* Atomic.swift */; };
-		533FD2F62312091F00A0020E /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* Store.swift */; };
+		533FD2F62312091F00A0020E /* DataBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* DataBroker.swift */; };
 		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
 		5364571B2320BCFE006C1CFE /* PageValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571A2320BCFE006C1CFE /* PageValue.swift */; };
 		5364571D2320BEE7006C1CFE /* MetadataValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571C2320BEE7006C1CFE /* MetadataValue.swift */; };
@@ -30,7 +30,7 @@
 
 /* Begin PBXFileReference section */
 		53054B22231B7A550063781E /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
-		533FD2F52312091F00A0020E /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		533FD2F52312091F00A0020E /* DataBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBroker.swift; sourceTree = "<group>"; };
 		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
 		5364571A2320BCFE006C1CFE /* PageValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageValue.swift; sourceTree = "<group>"; };
 		5364571C2320BEE7006C1CFE /* MetadataValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataValue.swift; sourceTree = "<group>"; };
@@ -65,15 +65,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		533EFEB8231B3005006F6B4C /* Persistence */ = {
+		533EFEB8231B3005006F6B4C /* Database */ = {
 			isa = PBXGroup;
 			children = (
 				538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */,
+				539A73F2231A34C1005E2788 /* CloudDB.swift */,
+				533FD2F52312091F00A0020E /* DataBroker.swift */,
 				538F9749231E1BC8006D8734 /* LocalDB.swift */,
-				533FD2F52312091F00A0020E /* Store.swift */,
 				53DF04AD231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld */,
 			);
-			path = Persistence;
+			path = Database;
 			sourceTree = "<group>";
 		};
 		536457192320BCD7006C1CFE /* Model */ = {
@@ -92,14 +93,6 @@
 				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		5385E93D2322207A00DDC8EB /* CloudDatabase */ = {
-			isa = PBXGroup;
-			children = (
-				539A73F2231A34C1005E2788 /* CloudDB.swift */,
-			);
-			path = CloudDatabase;
 			sourceTree = "<group>";
 		};
 		53BD45CF2311B60200712A61 /* EditorWindow */ = {
@@ -144,11 +137,10 @@
 				53054B22231B7A550063781E /* Atomic.swift */,
 				537B110F2318E47F00D49732 /* Preferences.swift */,
 				53490C90231253D300016DC2 /* WindowManager.swift */,
-				5385E93D2322207A00DDC8EB /* CloudDatabase */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
 				536457202320D41D006C1CFE /* Extensions */,
 				536457192320BCD7006C1CFE /* Model */,
-				533EFEB8231B3005006F6B4C /* Persistence */,
+				533EFEB8231B3005006F6B4C /* Database */,
 				53EA43DF230F8A7D00019BE2 /* Support Files */,
 			);
 			path = ScratchPad;
@@ -240,7 +232,7 @@
 				539A73F3231A34C1005E2788 /* CloudDB.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				5364571B2320BCFE006C1CFE /* PageValue.swift in Sources */,
-				533FD2F62312091F00A0020E /* Store.swift in Sources */,
+				533FD2F62312091F00A0020E /* DataBroker.swift in Sources */,
 				5364571F2320C96A006C1CFE /* NSAttributedString+Extension.swift in Sources */,
 				53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */,
 				53490C91231253D300016DC2 /* WindowManager.swift in Sources */,
