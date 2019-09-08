@@ -69,5 +69,22 @@ class EditorTextView: NSView {
     @objc func toggleInspectorBar(_ sender: Any) {
         textView.usesInspectorBar.toggle()
     }
+
+    static let defaultAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 16.0),
+        .foregroundColor: NSColor.controlTextColor,
+        .backgroundColor: NSColor.controlBackgroundColor
+    ]
+
+    @objc func revertSelectionToStandardAppearance(_ sender: Any) {
+        guard let storage = textView.textStorage,
+            let delegate = textView.delegate else { return }
+
+        let range = textView.selectedRange()
+        storage.setAttributes(EditorTextView.defaultAttributes, range: range)
+
+        let msg = Notification(name: NSText.didChangeNotification, object: textView)
+        delegate.textDidChange?(msg)
+    }
 }
 

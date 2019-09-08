@@ -652,6 +652,12 @@
                                     <action selector="toggleInspectorBar:" target="-1" id="ig8-Yj-hgz"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Revert Appearance" id="CTK-ca-1yL">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="revertSelectionToStandardAppearance:" target="-1" id="kv8-95-JfM"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

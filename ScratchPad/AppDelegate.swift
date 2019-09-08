@@ -93,10 +93,11 @@ extension AppDelegate {
     }
 
     @IBAction func toggleInspectorBar(_ sender: NSMenuItem) {
-        // Must be present for menu item to render as active.
+        // A custom action to be implemented by the editor text view as first responder.
+    }
 
-        // This action is handled by any first responder
-        // implementing this tagged as @objc.
+    @IBAction func revertSelectionToStandardAppearance(_ sender: NSMenuItem) {
+        // A custom action to be implemented by the editor text view as first responder.
     }
 }
 

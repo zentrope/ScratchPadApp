@@ -121,13 +121,9 @@ class DataBroker {
     }
 
     private func makePage(name: String) -> Page {
-        let attrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 16.0),
-            .foregroundColor: NSColor.controlTextColor
-        ]
-
         let message = name.lowercased() == mainArticleIndex.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
-        let body = NSAttributedString(string: message, attributes: attrs)
+        let body = NSMutableAttributedString(string: message)
+        body.setAttributes(EditorTextView.defaultAttributes, range: NSMakeRange(0, body.length))
 
         return Page(name: name.lowercased(), dateCreated: Date(), dateUpdated: Date(), body: body)
     }

@@ -107,26 +107,35 @@ extension EditorViewController: NSTextViewDelegate {
         return sep
     }
 
+    private var revertItem: NSMenuItem {
+        return NSMenuItem(title: "Revert Appearance",
+                          action: #selector(EditorTextView.revertSelectionToStandardAppearance(_:)),
+                          keyEquivalent: "",
+                          tag: 668)
+    }
+
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
         menu.removeItemIfPresent(connectMenu)
+        menu.removeItemIfPresent(revertItem)
         menu.removeItemIfPresent(connectSep)
 
         let range = view.selectedRange()
-        let isLinkable = range.length > 0
 
-        if !isLinkable {
+        if range.length < 1 {
             return menu
         }
 
-        if let selection = view.textStorage?.attributedSubstring(from: range).string {
-            if !windowManager.isValidLinkName(selection) {
-                return menu
-            }
+        guard let selection = view.textStorage?.attributedSubstring(from: range).string else { return menu }
+
+        if !windowManager.isValidLinkName(selection) {
+            menu.insertItem(revertItem, at: 0)
+            menu.insertItem(connectSep, at: 1)
+            return menu
         }
 
         menu.insertItem(connectMenu, at: 0)
-        menu.insertItem(connectSep, at: 1)
-
+        menu.insertItem(revertItem, at: 1)
+        menu.insertItem(connectSep, at: 2)
         return menu
     }
 
