@@ -50,7 +50,7 @@ class EditorTextView: NSView {
         textView.isSelectable = true
         textView.allowsUndo = true
 
-        textView.usesInspectorBar = true
+        textView.usesInspectorBar = false
         textView.usesRuler = true
         textView.usesFindBar = true
 
@@ -64,6 +64,10 @@ class EditorTextView: NSView {
         textView.isContinuousSpellCheckingEnabled = true
         textView.isAutomaticSpellingCorrectionEnabled = true
         textView.isAutomaticQuoteSubstitutionEnabled = true
+    }
+
+    @objc func toggleInspectorBar(_ sender: Any) {
+        textView.usesInspectorBar.toggle()
     }
 }
 

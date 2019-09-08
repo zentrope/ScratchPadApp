@@ -91,6 +91,13 @@ extension AppDelegate {
             NotificationCenter.default.post(name: .cloudDataChanged, object: self)
         }
     }
+
+    @IBAction func toggleInspectorBar(_ sender: NSMenuItem) {
+        // Must be present for menu item to render as active.
+
+        // This action is handled by any first responder
+        // implementing this tagged as @objc.
+    }
 }
 
 // MARK: - Auxiliary Menu Concerns

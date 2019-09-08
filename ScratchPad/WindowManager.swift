@@ -16,7 +16,6 @@ class WindowManager {
     static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
 
     private var windows = [String:EditorWindowController]()
-
     private var broker: DataBroker
 
     var count: Int {
@@ -76,7 +75,6 @@ class WindowManager {
             if let win = windows[name] {
                 win.close()
             }
-            //close(pageNamed: name)
         }
     }
 

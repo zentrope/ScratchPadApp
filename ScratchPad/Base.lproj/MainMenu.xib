@@ -646,6 +646,12 @@
                                     <action selector="refreshAllFromCloud:" target="-1" id="NtS-cR-GyY"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Toggle Inspector Bar" keyEquivalent="i" id="by0-Yn-3cs">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleInspectorBar:" target="-1" id="ig8-Yj-hgz"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

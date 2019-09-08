@@ -19,15 +19,6 @@ class EditorWindowController: NSWindowController {
     private var broker: DataBroker!
     private var windowManager: WindowManager!
 
-    private var isInspectorVisible: Bool = true {
-        didSet {
-            guard let win = window else { return }
-            if win.titlebarAccessoryViewControllers.count > 0 {
-                win.titlebarAccessoryViewControllers[0].isHidden = !isInspectorVisible
-            }
-        }
-    }
-
     init(broker: DataBroker, page: Page, windowManager: WindowManager) {
         self.windowManager = windowManager
         self.broker = broker
@@ -53,17 +44,6 @@ class EditorWindowController: NSWindowController {
 }
 
 extension EditorWindowController: NSWindowDelegate {
-
-    func windowDidBecomeKey(_ notification: Notification) {
-
-        // Hide then show the inspector bar because somehow there's a 26pt gap
-        // between the inspector and the contentView if we don't. Some sort of
-        // layout issue due to the way I'm programatticaly creating the window
-        // and the content view?
-
-        isInspectorVisible = false
-        isInspectorVisible = true
-    }
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: saveName)
