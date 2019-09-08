@@ -142,6 +142,7 @@ extension AppDelegate {
         case 2001..<3001:
             let pageName = sender.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             if localDB.exists(pageNamed: pageName) {
+                NSApp.activate(ignoringOtherApps: true)
                 windowManager.open(name: pageName)
             }
         case 3001:

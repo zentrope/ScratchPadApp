@@ -8,10 +8,10 @@
       location = "group:Support"
       name = "Support">
       <FileRef
-         location = "group:To Do.ooutline">
+         location = "group:ScratchPad Icon.afdesign">
       </FileRef>
       <FileRef
-         location = "group:ScratchPad Icon.afdesign">
+         location = "group:/Users/keith/Source/ScratchPad/Support/ScratchPad Queue.ooutline">
       </FileRef>
    </Group>
    <FileRef
