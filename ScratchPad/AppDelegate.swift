@@ -199,6 +199,11 @@ extension AppDelegate {
                 self?.broker.replace(metadata: record)
             }
         }
+
+        // Experiment: how about we do this rather than pass stuff all over the place?
+
+        Environment.shared.dataBroker = broker
+        Environment.shared.localDB = localDB
     }
 
     private func registerForUrlEvents() {

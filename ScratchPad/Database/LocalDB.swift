@@ -154,6 +154,22 @@ class LocalDB: NSPersistentContainer {
         return result
     }
 
+    func fetch() -> [Page] {
+        var result = [Page]()
+        viewContext.performAndWait {
+            do {
+                let request: NSFetchRequest<PageMO> = PageMO.fetchRequest()
+                let pages = try viewContext.fetch(request)
+                pages.forEach {
+                    result.append(Page.fromManagedObject(page: $0))
+                }
+            } catch {
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
+            }
+        }
+        return result
+    }
+
     func fetch(metadata name: String) -> RecordMetadata? {
         var result: RecordMetadata?
 
