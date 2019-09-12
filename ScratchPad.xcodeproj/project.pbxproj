@@ -11,6 +11,8 @@
 		5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94223242B7700504A5B /* NSImage+Extension.swift */; };
 		5318C94523243CE700504A5B /* NSMenuItem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */; };
 		533FD2F62312091F00A0020E /* DataBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* DataBroker.swift */; };
+		534230072329FE160056B1E9 /* PageBrowserWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534230062329FE160056B1E9 /* PageBrowserWindowController.swift */; };
+		53423009232A06E20056B1E9 /* PageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53423008232A06E20056B1E9 /* PageBrowserViewController.swift */; };
 		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
 		5364571B2320BCFE006C1CFE /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571A2320BCFE006C1CFE /* Page.swift */; };
 		5364571D2320BEE7006C1CFE /* RecordMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571C2320BEE7006C1CFE /* RecordMetadata.swift */; };
@@ -35,6 +37,8 @@
 		5318C94223242B7700504A5B /* NSImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Extension.swift"; sourceTree = "<group>"; };
 		5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Extension.swift"; sourceTree = "<group>"; };
 		533FD2F52312091F00A0020E /* DataBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBroker.swift; sourceTree = "<group>"; };
+		534230062329FE160056B1E9 /* PageBrowserWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageBrowserWindowController.swift; sourceTree = "<group>"; };
+		53423008232A06E20056B1E9 /* PageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageBrowserViewController.swift; sourceTree = "<group>"; };
 		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
 		5364571A2320BCFE006C1CFE /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		5364571C2320BEE7006C1CFE /* RecordMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMetadata.swift; sourceTree = "<group>"; };
@@ -79,6 +83,15 @@
 				53DF04AD231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld */,
 			);
 			path = Database;
+			sourceTree = "<group>";
+		};
+		534230052329FDEA0056B1E9 /* BrowserWindow */ = {
+			isa = PBXGroup;
+			children = (
+				534230062329FE160056B1E9 /* PageBrowserWindowController.swift */,
+				53423008232A06E20056B1E9 /* PageBrowserViewController.swift */,
+			);
+			path = BrowserWindow;
 			sourceTree = "<group>";
 		};
 		536457192320BCD7006C1CFE /* Model */ = {
@@ -143,10 +156,11 @@
 				53054B22231B7A550063781E /* Atomic.swift */,
 				537B110F2318E47F00D49732 /* Preferences.swift */,
 				53490C90231253D300016DC2 /* WindowManager.swift */,
+				534230052329FDEA0056B1E9 /* BrowserWindow */,
+				533EFEB8231B3005006F6B4C /* Database */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
 				536457202320D41D006C1CFE /* Extensions */,
 				536457192320BCD7006C1CFE /* Model */,
-				533EFEB8231B3005006F6B4C /* Database */,
 				53EA43DF230F8A7D00019BE2 /* Support Files */,
 			);
 			path = ScratchPad;
@@ -260,7 +274,9 @@
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				5364571B2320BCFE006C1CFE /* Page.swift in Sources */,
 				533FD2F62312091F00A0020E /* DataBroker.swift in Sources */,
+				53423009232A06E20056B1E9 /* PageBrowserViewController.swift in Sources */,
 				5364571F2320C96A006C1CFE /* NSAttributedString+Extension.swift in Sources */,
+				534230072329FE160056B1E9 /* PageBrowserWindowController.swift in Sources */,
 				53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */,
 				5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */,
 				53490C91231253D300016DC2 /* WindowManager.swift in Sources */,

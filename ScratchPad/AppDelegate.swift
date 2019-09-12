@@ -78,6 +78,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+// MARK: - Menu Commands
+
+extension AppDelegate {
+
+    @IBAction func openPageBrowserWindow(_ sender: NSMenuItem) {
+        let pageBrowser = PageBrowserWindowController()
+        pageBrowser.window?.makeKeyAndOrderFront(self)
+    }
+}
 
 // MARK: - Develop Menu
 
@@ -109,13 +118,17 @@ extension AppDelegate {
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength )
         if let button = statusBarItem.button {
             button.image = NSImage(named: "skew")?.scaled(toHeight: 17)
+            button.image?.isTemplate = true
             button.imageScaling = .scaleProportionallyDown
         }
         statusBarItem.menu = makeHelperMenu(includeQuit: true)
     }
 
     private func makeHelperMenu(includeQuit: Bool = false) -> NSMenu {
-        let openMain = NSMenuItem(title: "Open Main ScratchPad", action: #selector(statusBarMenuSelected), keyEquivalent: "", tag: 1001)
+        let openMain = NSMenuItem(title: "Main ScratchPad", action: #selector(statusBarMenuSelected), keyEquivalent: "", tag: 1001)
+
+        let openPageBrowser = NSMenuItem(title: "Page Browser", action: #selector(statusBarMenuSelected(_:)), keyEquivalent: "b", tag: 1002)
+        openPageBrowser.keyEquivalentModifierMask = [.option, .command]
 
         let scratchPadSelector = NSMenuItem(title: "ScratchPads", action: nil, keyEquivalent: "")
 
@@ -129,6 +142,7 @@ extension AppDelegate {
 
         let menu = NSMenu()
         menu.addItem(openMain)
+        menu.addItem(openPageBrowser)
         menu.addItem(.separator())
         menu.addItem(scratchPadSelector)
         for padMenu in padMenus {
@@ -147,6 +161,8 @@ extension AppDelegate {
         switch sender.tag {
         case 1001:
             openMainWindow()
+        case 1002:
+            openPageBrowserWindow(sender)
         case 2001..<3001:
             let pageName = sender.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             if localDB.exists(pageNamed: pageName) {
