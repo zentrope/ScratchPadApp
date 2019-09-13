@@ -202,6 +202,7 @@ extension AppDelegate {
 
         Environment.shared.dataBroker = broker
         Environment.shared.localDB = localDB
+        Environment.shared.windowManager = windowManager
     }
 
     private func registerForUrlEvents() {

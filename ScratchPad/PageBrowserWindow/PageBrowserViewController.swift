@@ -68,6 +68,8 @@ class PageBrowserViewController: NSViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.doubleAction = #selector(openPageOnDoubleClick(_:))
+
         reload()
 
         observer = NotificationCenter.default.addObserver(forName: .localDatabaseUpdated, object: nil, queue: .main) {
@@ -120,6 +122,11 @@ class PageBrowserViewController: NSViewController {
         let data = Environment.shared.localDB?.fetch() ?? [Page]()
         pages = data.sorted(by: { $0.dateUpdated > $1.dateUpdated })
         tableView.reloadData()
+    }
+
+    @objc func openPageOnDoubleClick(_ sender: NSTableView) {
+        let page = pages[sender.clickedRow]
+        Environment.shared.windowManager?.open(name: page.name)
     }
 }
 

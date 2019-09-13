@@ -14,6 +14,7 @@ class Environment {
 
     var dataBroker: DataBroker?
     var localDB: LocalDB?
+    var windowManager: WindowManager?
 
     init() {
     }
