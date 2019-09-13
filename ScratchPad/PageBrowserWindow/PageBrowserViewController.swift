@@ -62,13 +62,15 @@ class PageBrowserViewController: NSViewController {
         self.view = view
     }
 
+    private var observer: NSObjectProtocol?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
         reload()
 
-        NotificationCenter.default.addObserver(forName: .localDatabaseUpdated, object: nil, queue: .main) {
+        observer = NotificationCenter.default.addObserver(forName: .localDatabaseUpdated, object: nil, queue: .main) {
             [weak self] msg in
             guard let info = msg.userInfo else { return }
 
@@ -76,6 +78,12 @@ class PageBrowserViewController: NSViewController {
             self?.reload(updates: info[NSUpdatedObjectsKey] as? [Page] ?? [Page](),
                          deletes: info[NSDeletedObjectsKey] as? [Page] ?? [Page](),
                          inserts: info[NSInsertedObjectsKey] as? [Page] ?? [Page]())
+        }
+    }
+
+    override func viewDidDisappear() {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer, name: .localDatabaseUpdated, object: nil)
         }
     }
 
