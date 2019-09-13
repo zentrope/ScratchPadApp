@@ -13,6 +13,10 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "LocalDB")
 
+extension Notification.Name {
+    static let localDatabaseUpdated = Notification.Name("localDatabaseUpdated")
+}
+
 extension Page {
     static func fromManagedObject(page: PageMO) -> Page {
         return Page(
@@ -52,6 +56,33 @@ class LocalDB: NSPersistentContainer {
                 fatalError(error.localizedDescription)
             }
         }
+
+        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: localDB.viewContext, queue: .main) { msg in
+            // Converting the data into value objects so I can keep managed objects isolate to this file.
+
+            guard let uinfo = msg.userInfo else { return }
+
+            let updates = (uinfo[NSUpdatedObjectsKey] as? Set<NSManagedObject>)?
+                .compactMap { $0 as? PageMO }
+                .map { Page.fromManagedObject(page: $0)} ?? [Page]()
+
+            let deletes = (uinfo[NSDeletedObjectsKey] as? Set<NSManagedObject>)?
+                .compactMap { $0 as? PageMO }
+                .map { Page.fromManagedObject(page: $0)} ?? [Page]()
+
+            let inserts = (uinfo[NSInsertedObjectsKey] as? Set<NSManagedObject>)?
+                .compactMap { $0 as? PageMO }
+                .map { Page.fromManagedObject(page: $0)} ?? [Page]()
+
+            let info = [
+                NSUpdatedObjectsKey: updates,
+                NSDeletedObjectsKey: deletes,
+                NSInsertedObjectsKey: inserts
+            ]
+
+            NotificationCenter.default.post(name: .localDatabaseUpdated, object: self, userInfo: info)
+        }
+
         return localDB
     }
 

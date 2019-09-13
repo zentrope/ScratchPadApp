@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Page {
+struct Page: Hashable {
     var name: String
     var dateCreated: Date
     var dateUpdated: Date

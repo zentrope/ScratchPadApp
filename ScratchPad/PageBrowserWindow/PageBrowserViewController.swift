@@ -68,10 +68,44 @@ class PageBrowserViewController: NSViewController {
         tableView.dataSource = self
         reload()
 
-        NotificationCenter.default.addObserver(forName: .cloudDataChanged, object: nil, queue: .main) {
-            [weak self] _ in
-            self?.reload()
+        NotificationCenter.default.addObserver(forName: .localDatabaseUpdated, object: nil, queue: .main) {
+            [weak self] msg in
+            guard let info = msg.userInfo else { return }
+
+            // Doing a single reload is fine for this app, but I want to see what this looks like.
+            self?.reload(updates: info[NSUpdatedObjectsKey] as? [Page] ?? [Page](),
+                         deletes: info[NSDeletedObjectsKey] as? [Page] ?? [Page](),
+                         inserts: info[NSInsertedObjectsKey] as? [Page] ?? [Page]())
         }
+    }
+
+    private func reload(updates: [Page], deletes: [Page], inserts: [Page]) {
+        let updatesDict = updates.reduce(into: [String:Page]()) { (accum, page) in accum[page.name] = page }
+
+        let deleteDict = deletes.reduce(into: [String:Page]()) { (accum, page) in accum[page.name] = page }
+
+        let cols = IndexSet(integersIn: 0..<self.tableView.tableColumns.count)
+
+        for (index, page) in self.pages.enumerated() {
+            if let update = updatesDict[page.name] {
+                self.pages[index] = update
+                self.tableView.reloadData(forRowIndexes: [index], columnIndexes: cols)
+            }
+        }
+
+        let rowsToDelete = self.pages.enumerated().compactMap( { deleteDict[$1.name] != nil ? $0 : nil })
+        for row in rowsToDelete {
+            self.tableView.removeRows(at: [row], withAnimation: .effectFade)
+            self.pages.remove(at: row)
+        }
+
+
+        inserts.forEach {
+            self.pages.insert($0, at: 0)
+            self.tableView.insertRows(at: [0], withAnimation: .effectFade)
+        }
+
+        // Call sort descriptor stuff when it's ready
     }
 
     private func reload() {

@@ -111,7 +111,6 @@ class DataBroker {
             }
             self.scheduleChangeMonitor()
         }
-        NotificationCenter.default.post(name: .cloudDataChanged, object: self)
     }
 
     private func newPage(name: String) -> Page {
