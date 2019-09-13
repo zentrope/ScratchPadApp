@@ -13,6 +13,20 @@ class PageBrowserWindowController: NSWindowController {
     private let autoSaveName = "SPBrowserWindow"
     private let viewController: PageBrowserViewController
 
+    private static var windowController: PageBrowserWindowController?
+
+    static func open() {
+        guard windowController == nil else { return }
+
+        let controller = PageBrowserWindowController()
+        controller.window?.makeKeyAndOrderFront(nil)
+        windowController = controller
+    }
+
+    private static func close() {
+        PageBrowserWindowController.windowController = nil
+    }
+
     init() {
         self.viewController = PageBrowserViewController()
 
@@ -43,5 +57,6 @@ extension PageBrowserWindowController: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: autoSaveName)
+        PageBrowserWindowController.close()
     }
 }

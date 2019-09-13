@@ -40,7 +40,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.isInitialized = true
             self.makeStatusBarItem()
             self.openMainWindow()
-            //self.registerForCoreDataChanges()
         }
     }
 
@@ -83,8 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate {
 
     @IBAction func openPageBrowserWindow(_ sender: NSMenuItem) {
-        let pageBrowser = PageBrowserWindowController()
-        pageBrowser.window?.makeKeyAndOrderFront(self)
+        PageBrowserWindowController.open()
     }
 }
 
@@ -242,25 +240,6 @@ extension AppDelegate {
         if noVisibleWindows() {
             openMainWindow()
         }
-    }
-
-    private func registerForCoreDataChanges() {
-        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: self.localDB.viewContext, queue: .main) { msg in
-            print("Core Data Change Notification: note changes, bg thread can send 'em later.")
-
-            guard let uinfo = msg.userInfo else { return }
-
-            if let updated = uinfo[NSUpdatedObjectsKey] as? Set<NSManagedObject> {
-                print(" updated: \(updated.count)")
-            }
-            if let deleted = uinfo[NSDeletedObjectsKey] as? Set<NSManagedObject> {
-                print(" deleted: \(deleted.count)")
-            }
-            if let inserted = uinfo[NSInsertedObjectsKey] as? Set<NSManagedObject> {
-                print("inserted: \(inserted.count)")
-            }
-        }
-
     }
 }
 
