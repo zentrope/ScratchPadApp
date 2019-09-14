@@ -16,7 +16,7 @@
 		5342300B232A0A2B0056B1E9 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300A232A0A2B0056B1E9 /* Environment.swift */; };
 		5342300D232A10280056B1E9 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300C232A10280056B1E9 /* String+Extension.swift */; };
 		5342300F232A13060056B1E9 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300E232A13060056B1E9 /* Date+Extension.swift */; };
-		53490C91231253D300016DC2 /* WindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* WindowManager.swift */; };
+		53490C91231253D300016DC2 /* Windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* Windows.swift */; };
 		5364571B2320BCFE006C1CFE /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571A2320BCFE006C1CFE /* Page.swift */; };
 		5364571D2320BEE7006C1CFE /* RecordMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571C2320BEE7006C1CFE /* RecordMetadata.swift */; };
 		5364571F2320C96A006C1CFE /* NSAttributedString+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */; };
@@ -45,7 +45,7 @@
 		5342300A232A0A2B0056B1E9 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		5342300C232A10280056B1E9 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		5342300E232A13060056B1E9 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
-		53490C90231253D300016DC2 /* WindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowManager.swift; sourceTree = "<group>"; };
+		53490C90231253D300016DC2 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
 		5364571A2320BCFE006C1CFE /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		5364571C2320BEE7006C1CFE /* RecordMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMetadata.swift; sourceTree = "<group>"; };
 		5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extension.swift"; sourceTree = "<group>"; };
@@ -84,7 +84,6 @@
 			children = (
 				538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */,
 				539A73F2231A34C1005E2788 /* CloudDB.swift */,
-				533FD2F52312091F00A0020E /* DataBroker.swift */,
 				538F9749231E1BC8006D8734 /* LocalDB.swift */,
 				53DF04AD231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld */,
 			);
@@ -126,9 +125,10 @@
 		53B27C86232D64310057EE7C /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				533FD2F52312091F00A0020E /* DataBroker.swift */,
 				5342300A232A0A2B0056B1E9 /* Environment.swift */,
 				537B110F2318E47F00D49732 /* Preferences.swift */,
-				53490C90231253D300016DC2 /* WindowManager.swift */,
+				53490C90231253D300016DC2 /* Windows.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -299,7 +299,7 @@
 				53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */,
 				5342300B232A0A2B0056B1E9 /* Environment.swift in Sources */,
 				5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */,
-				53490C91231253D300016DC2 /* WindowManager.swift in Sources */,
+				53490C91231253D300016DC2 /* Windows.swift in Sources */,
 				53BD45CC2311B36500712A61 /* EditorWC.swift in Sources */,
 				53EA43DE230F86C800019BE2 /* EditorVC.swift in Sources */,
 				53FC14E323237B180034B9F1 /* PageUpdate.swift in Sources */,

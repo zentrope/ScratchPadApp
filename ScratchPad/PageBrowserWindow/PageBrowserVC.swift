@@ -128,7 +128,7 @@ class PageBrowserVC: NSViewController {
 
     @objc private func openPageOnDoubleClick(_ sender: NSTableView) {
         let page = pages[sender.clickedRow]
-        Environment.windowManager.open(name: page.name)
+        Environment.windows.open(name: page.name)
     }
 }
 
@@ -155,7 +155,7 @@ extension PageBrowserVC {
     @objc private func deletePageClicked(_ sender: NSMenuItem) {
         guard tableView.clickedRow > -1 else { return }
         let page = pages[tableView.clickedRow]
-        Environment.windowManager.disappear(pageNamed: page.name)
+        Environment.windows.disappear(pageNamed: page.name)
         Environment.dataBroker.delete(page: page)
         NotificationCenter.default.post(name: .cloudDataChanged, object: self)
     }
@@ -164,7 +164,7 @@ extension PageBrowserVC {
         let row = tableView.clickedRow
         guard row > -1 else { return }
         let name = pages[row].name
-        Environment.windowManager.open(name: name)
+        Environment.windows.open(name: name)
     }
 
     private func setupContextMenu() {

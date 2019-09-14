@@ -1,5 +1,5 @@
 //
-//  WindowManager.swift
+//  Windows.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 8/24/19.
@@ -11,7 +11,7 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "WindowManager")
 
-class WindowManager {
+class Windows {
 
     static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
 
@@ -25,11 +25,11 @@ class WindowManager {
     }
 
     func isScratchPadLink(link: String) -> Bool {
-        return link.lowercased().hasPrefix(WindowManager.linkSchema)
+        return link.lowercased().hasPrefix(Windows.linkSchema)
     }
 
     func makeLink(_ name: String) -> String {
-        return "\(WindowManager.linkSchema)\(name)"
+        return "\(Windows.linkSchema)\(name)"
     }
 
     func open(link urlStr: String) {
@@ -102,6 +102,6 @@ class WindowManager {
 
     private func unlink(_ link: String) -> String {
         return link.trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: WindowManager.linkSchema, with: "")
+            .replacingOccurrences(of: Windows.linkSchema, with: "")
     }
 }

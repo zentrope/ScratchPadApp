@@ -162,10 +162,10 @@ extension AppDelegate {
             let pageName = sender.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             if localDB.exists(pageNamed: pageName) {
                 NSApp.activate(ignoringOtherApps: true)
-                Environment.windowManager.open(name: pageName)
+                Environment.windows.open(name: pageName)
             }
         case 3001:
-            Environment.windowManager.closeAll()
+            Environment.windows.closeAll()
         case 9001:
             NSApp.activate(ignoringOtherApps: true)
             NSApp.terminate(self)
@@ -184,10 +184,10 @@ extension AppDelegate {
         let preferences = Preferences()
         cloudDB = CloudDB(preferences: preferences)
 
-        // Experiment: how about we do this rather than pass stuff all over the place?
+        // Experiment: how about we do this rather than pass stuff all over the place? When testing, set this up with mocks (or whatever) and fire away. Advantage: don't have to pass unused dependencies down a chain of objects. Disadvantage: difficult to tell at a glance what depends on what.
 
         Environment.shared.dataBroker = DataBroker(database: localDB, cloudData: cloudDB)
-        Environment.shared.windowManager =  WindowManager()
+        Environment.shared.windows =  Windows()
         Environment.shared.preferences = preferences
 
         cloudDB.action = { event in
@@ -212,14 +212,14 @@ extension AppDelegate {
         guard let urlStr = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else { return }
         guard let link = urlStr.removingPercentEncoding else { return }
 
-        if Environment.windowManager.isScratchPadLink(link: link) {
-            Environment.windowManager.open(link: link)
+        if Environment.windows.isScratchPadLink(link: link) {
+            Environment.windows.open(link: link)
         }
     }
 
     @objc private func openMainWindow() {
         if isInitialized {
-            Environment.windowManager.spawnMainPage()
+            Environment.windows.spawnMainPage()
         }
     }
 

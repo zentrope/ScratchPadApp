@@ -81,7 +81,7 @@ extension EditorVC: NSTextViewDelegate {
     @objc func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()
         if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).string {
-            Environment.windowManager.open(name: newPage)
+            Environment.windows.open(name: newPage)
             let newRange = NSMakeRange(range.location, 0)
             editor.textView.setSelectedRange(newRange)
             render(editor.textView)
@@ -123,7 +123,7 @@ extension EditorVC: NSTextViewDelegate {
 
         guard let selection = view.textStorage?.attributedSubstring(from: range).string else { return menu }
 
-        if !Environment.windowManager.isValidLinkName(selection) {
+        if !Environment.windows.isValidLinkName(selection) {
             menu.insertItem(revertItem, at: 0)
             menu.insertItem(connectSep, at: 1)
             return menu
@@ -137,8 +137,8 @@ extension EditorVC: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         guard let link = link as? String else { return false }
-        if Environment.windowManager.isScratchPadLink(link: link) {
-            Environment.windowManager.open(link: link)
+        if Environment.windows.isScratchPadLink(link: link) {
+            Environment.windows.open(link: link)
             return true
         }
         return false
@@ -151,7 +151,7 @@ extension EditorVC: NSTextViewDelegate {
         // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
         source.removeAttribute(.link, range: NSMakeRange(0, source.length))
         for title in Environment.dataBroker.names {
-            let link = Environment.windowManager.makeLink(title)
+            let link = Environment.windows.makeLink(title)
             do {
                 try source.addLink(word: title, link: link)
             }

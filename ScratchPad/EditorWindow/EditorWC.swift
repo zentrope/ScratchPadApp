@@ -44,6 +44,6 @@ extension EditorWC: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: saveName)
-        Environment.windowManager.close(pageNamed: pageName)
+        Environment.windows.close(pageNamed: pageName)
     }
 }

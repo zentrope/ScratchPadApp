@@ -21,9 +21,9 @@ class Environment {
         }
     }
 
-    static var windowManager: WindowManager {
+    static var windows: Windows {
         get {
-            return shared.windowManager
+            return shared.windows
         }
     }
 
@@ -38,7 +38,7 @@ class Environment {
 
     // The app needs to fail hard if these aren't set
     var dataBroker: DataBroker!
-    var windowManager: WindowManager!
+    var windows: Windows!
     var preferences: ScratchPadPrefs!
 
     init() {
