@@ -12,10 +12,6 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "CloudDB")
 
-extension Notification.Name {
-    static let cloudDataChanged = Notification.Name("cloudDataChanged")
-}
-
 enum CloudError : Error {
     case NoMetadata
 }

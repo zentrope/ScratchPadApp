@@ -13,10 +13,6 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "LocalDB")
 
-extension Notification.Name {
-    static let localDatabaseUpdated = Notification.Name("localDatabaseUpdated")
-}
-
 extension Page {
     static func fromManagedObject(page: PageMO) -> Page {
         return Page(

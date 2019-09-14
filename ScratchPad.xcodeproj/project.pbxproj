@@ -24,6 +24,7 @@
 		538F9748231E1534006D8734 /* CKMetadataValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */; };
 		538F974A231E1BC8006D8734 /* LocalDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9749231E1BC8006D8734 /* LocalDB.swift */; };
 		539A73F3231A34C1005E2788 /* CloudDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539A73F2231A34C1005E2788 /* CloudDB.swift */; };
+		53B27C88232D6C8A0057EE7C /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B27C87232D6C8A0057EE7C /* Notifications.swift */; };
 		53BD45CC2311B36500712A61 /* EditorWC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CB2311B36500712A61 /* EditorWC.swift */; };
 		53DD107E231633E500D4E98D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53DD107D231633E500D4E98D /* CloudKit.framework */; };
 		53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53DF04AD231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld */; };
@@ -53,6 +54,7 @@
 		538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKMetadataValueTransformer.swift; sourceTree = "<group>"; };
 		538F9749231E1BC8006D8734 /* LocalDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDB.swift; sourceTree = "<group>"; };
 		539A73F2231A34C1005E2788 /* CloudDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudDB.swift; sourceTree = "<group>"; };
+		53B27C87232D6C8A0057EE7C /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		53BD45CB2311B36500712A61 /* EditorWC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWC.swift; sourceTree = "<group>"; };
 		53DD107D231633E500D4E98D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		53DF04AE231CAF8D00B29AEC /* ScratchPadModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ScratchPadModel.xcdatamodel; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 			children = (
 				53054B22231B7A550063781E /* Atomic.swift */,
 				5342300E232A13060056B1E9 /* Date+Extension.swift */,
+				53B27C87232D6C8A0057EE7C /* Notifications.swift */,
 				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
 				5318C94223242B7700504A5B /* NSImage+Extension.swift */,
 				5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */,
@@ -186,9 +189,9 @@
 		53EA43DF230F8A7D00019BE2 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				53EA43D3230F85C800019BE2 /* MainMenu.xib */,
 				53EA43D1230F85C800019BE2 /* Assets.xcassets */,
 				53EA43D6230F85C800019BE2 /* Info.plist */,
+				53EA43D3230F85C800019BE2 /* MainMenu.xib */,
 				53EA43D7230F85C800019BE2 /* ScratchPad.entitlements */,
 			);
 			name = "Support Files";
@@ -285,6 +288,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53B27C88232D6C8A0057EE7C /* Notifications.swift in Sources */,
 				537B11102318E47F00D49732 /* Preferences.swift in Sources */,
 				53EDDFD62311A94500E2FABB /* EditorTextView.swift in Sources */,
 				539A73F3231A34C1005E2788 /* CloudDB.swift in Sources */,
