@@ -16,14 +16,12 @@ class WindowManager {
     static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
 
     private var windows = [String:EditorWC]()
-    private var broker: DataBroker
 
     var count: Int {
         get { return windows.count }
     }
 
-    init(broker: DataBroker) {
-        self.broker = broker
+    init() {
     }
 
     func isScratchPadLink(link: String) -> Bool {
@@ -48,7 +46,7 @@ class WindowManager {
             win.window?.makeKeyAndOrderFront(self)
         } else {
             os_log("%{public}s", log: logger, type: .debug, "Spawning new '\(name)' window")
-            spawn(broker.find(index: name))
+            spawn(Environment.dataBroker.find(index: name))
         }
     }
 
@@ -61,11 +59,11 @@ class WindowManager {
     }
 
     func spawnMainPage() {
-        open(page: broker.mainPage())
+        open(page: Environment.dataBroker.mainPage())
     }
 
     func spawn(_ page: Page) {
-        let c = EditorWC(broker: broker, page: page, windowManager: self)
+        let c = EditorWC(page: page)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.name] = c
     }

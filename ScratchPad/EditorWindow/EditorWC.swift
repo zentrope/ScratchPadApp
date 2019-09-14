@@ -16,18 +16,14 @@ class EditorWC: NSWindowController {
     private var controller: EditorVC
     private var pageName: String
     private var saveName: NSWindow.FrameAutosaveName
-    private var broker: DataBroker!
-    private var windowManager: WindowManager!
 
-    init(broker: DataBroker, page: Page, windowManager: WindowManager) {
-        self.windowManager = windowManager
-        self.broker = broker
+    init(page: Page) {
         let position = NSMakeRect(200, 200, 600, 600)
         let window = NSWindow(contentRect: position, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
         self.pageName = page.name
         self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
-        self.controller = EditorVC(broker: broker, page: page, windowManager: windowManager)
+        self.controller = EditorVC(page: page)
 
         super.init(window: window)
 
@@ -48,6 +44,6 @@ extension EditorWC: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: saveName)
-        windowManager.close(pageNamed: pageName)
+        Environment.windowManager.close(pageNamed: pageName)
     }
 }

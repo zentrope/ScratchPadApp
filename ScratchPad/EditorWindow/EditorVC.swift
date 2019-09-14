@@ -16,13 +16,9 @@ class EditorVC: NSViewController {
     private let editor = EditorTextView()
 
     private var page: Page
-    private var broker: DataBroker
-    private var windowManager: WindowManager!
 
-    init(broker: DataBroker, page: Page, windowManager: WindowManager) {
-        self.windowManager = windowManager
+    init(page: Page) {
         self.page = page
-        self.broker = broker
         super.init(nibName: nil, bundle: nil)
         editor.attributedString = page.body
         render(editor.textView)
@@ -58,14 +54,14 @@ class EditorVC: NSViewController {
         }
     }
 
-    private func updateText(_ string: NSAttributedString) {        
-        broker.update(page: page.name, withText: string)
+    private func updateText(_ string: NSAttributedString) {
+        Environment.dataBroker.update(page: page.name, withText: string)
     }
 
     private func reloadFromStore() {
         // What if there are local changes not found in the updated version? How
         // do you merge these?
-        self.page = broker.find(index: page.name)
+        self.page = Environment.dataBroker.find(index: page.name)
         editor.attributedString = page.body
     }
 }
@@ -85,7 +81,7 @@ extension EditorVC: NSTextViewDelegate {
     @objc func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()
         if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).string {
-            windowManager?.open(name: newPage)
+            Environment.windowManager.open(name: newPage)
             let newRange = NSMakeRange(range.location, 0)
             editor.textView.setSelectedRange(newRange)
             render(editor.textView)
@@ -127,7 +123,7 @@ extension EditorVC: NSTextViewDelegate {
 
         guard let selection = view.textStorage?.attributedSubstring(from: range).string else { return menu }
 
-        if !windowManager.isValidLinkName(selection) {
+        if !Environment.windowManager.isValidLinkName(selection) {
             menu.insertItem(revertItem, at: 0)
             menu.insertItem(connectSep, at: 1)
             return menu
@@ -141,8 +137,8 @@ extension EditorVC: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         guard let link = link as? String else { return false }
-        if windowManager.isScratchPadLink(link: link) {
-            windowManager.open(link: link)
+        if Environment.windowManager.isScratchPadLink(link: link) {
+            Environment.windowManager.open(link: link)
             return true
         }
         return false
@@ -154,8 +150,8 @@ extension EditorVC: NSTextViewDelegate {
         // TODO: This will remove legit http links, too. Hm.
         // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
         source.removeAttribute(.link, range: NSMakeRange(0, source.length))
-        for title in broker.names {
-            let link = windowManager.makeLink(title)
+        for title in Environment.dataBroker.names {
+            let link = Environment.windowManager.makeLink(title)
             do {
                 try source.addLink(word: title, link: link)
             }

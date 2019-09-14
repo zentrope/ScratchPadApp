@@ -110,16 +110,27 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		536457202320D41D006C1CFE /* Extensions */ = {
+		536457202320D41D006C1CFE /* Extensions and Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				53054B22231B7A550063781E /* Atomic.swift */,
 				5342300E232A13060056B1E9 /* Date+Extension.swift */,
 				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
 				5318C94223242B7700504A5B /* NSImage+Extension.swift */,
 				5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */,
 				5342300C232A10280056B1E9 /* String+Extension.swift */,
 			);
-			path = Extensions;
+			path = "Extensions and Utilities";
+			sourceTree = "<group>";
+		};
+		53B27C86232D64310057EE7C /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5342300A232A0A2B0056B1E9 /* Environment.swift */,
+				537B110F2318E47F00D49732 /* Preferences.swift */,
+				53490C90231253D300016DC2 /* WindowManager.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		53BD45CF2311B60200712A61 /* EditorWindow */ = {
@@ -161,15 +172,12 @@
 			isa = PBXGroup;
 			children = (
 				53EA43CF230F85C700019BE2 /* AppDelegate.swift */,
-				53054B22231B7A550063781E /* Atomic.swift */,
-				5342300A232A0A2B0056B1E9 /* Environment.swift */,
-				537B110F2318E47F00D49732 /* Preferences.swift */,
-				53490C90231253D300016DC2 /* WindowManager.swift */,
 				533EFEB8231B3005006F6B4C /* Database */,
 				53BD45CF2311B60200712A61 /* EditorWindow */,
-				536457202320D41D006C1CFE /* Extensions */,
+				536457202320D41D006C1CFE /* Extensions and Utilities */,
 				536457192320BCD7006C1CFE /* Model */,
 				534230052329FDEA0056B1E9 /* PageBrowserWindow */,
+				53B27C86232D64310057EE7C /* Services */,
 				53EA43DF230F8A7D00019BE2 /* Support Files */,
 			);
 			path = ScratchPad;

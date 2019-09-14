@@ -121,14 +121,14 @@ class PageBrowserVC: NSViewController {
     }
 
     private func reload() {
-        let data = Environment.shared.dataBroker?.pages ?? [Page]()
+        let data = Environment.dataBroker.pages
         pages = data.sorted(by: { $0.dateUpdated > $1.dateUpdated })
         tableView.reloadData()
     }
 
-    @objc func openPageOnDoubleClick(_ sender: NSTableView) {
+    @objc private func openPageOnDoubleClick(_ sender: NSTableView) {
         let page = pages[sender.clickedRow]
-        Environment.shared.windowManager?.open(name: page.name)
+        Environment.windowManager.open(name: page.name)
     }
 }
 
@@ -155,8 +155,8 @@ extension PageBrowserVC {
     @objc private func deletePageClicked(_ sender: NSMenuItem) {
         guard tableView.clickedRow > -1 else { return }
         let page = pages[tableView.clickedRow]
-        Environment.shared.windowManager?.disappear(pageNamed: page.name)
-        Environment.shared.dataBroker?.delete(page: page)
+        Environment.windowManager.disappear(pageNamed: page.name)
+        Environment.dataBroker.delete(page: page)
         NotificationCenter.default.post(name: .cloudDataChanged, object: self)
     }
 
@@ -164,7 +164,7 @@ extension PageBrowserVC {
         let row = tableView.clickedRow
         guard row > -1 else { return }
         let name = pages[row].name
-        Environment.shared.windowManager?.open(name: name)
+        Environment.windowManager.open(name: name)
     }
 
     private func setupContextMenu() {
@@ -175,7 +175,7 @@ extension PageBrowserVC {
     @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard menuItem.action == #selector(deletePageClicked(_:)) else { return true }
         let clickedPageName = pages[tableView.clickedRow].name
-        let mainPageName = Environment.shared.dataBroker?.mainPageName ?? "main"
+        let mainPageName = Environment.dataBroker.mainPageName
         return !(clickedPageName == mainPageName)
     }
 }

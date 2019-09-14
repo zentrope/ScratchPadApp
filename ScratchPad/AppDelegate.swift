@@ -19,11 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let coreDataModelName = "ScratchPadModel"
 
-    private var windowManager: WindowManager!
     private var cloudDB: CloudDB!
     private var localDB: LocalDB!
-    private var preferences: Preferences!
-    private var broker: DataBroker!
 
     private var isInitialized = false
 
@@ -91,8 +88,8 @@ extension AppDelegate {
 extension AppDelegate {
 
     @IBAction func refreshAllFromCloud(_ sender: NSMenuItem) {
-        preferences.zoneRecordChangeToken = nil
-        preferences.databaseChangeToken = nil
+        Environment.preferences.zoneRecordChangeToken = nil
+        Environment.preferences.databaseChangeToken = nil
         cloudDB.fetchChanges(in: .private) {
             os_log("%{public}s", log: logger, "Develop menu: refreshAllFromCloud completed.")
             NotificationCenter.default.post(name: .cloudDataChanged, object: self)
@@ -165,10 +162,10 @@ extension AppDelegate {
             let pageName = sender.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             if localDB.exists(pageNamed: pageName) {
                 NSApp.activate(ignoringOtherApps: true)
-                windowManager.open(name: pageName)
+                Environment.windowManager.open(name: pageName)
             }
         case 3001:
-            windowManager.closeAll()
+            Environment.windowManager.closeAll()
         case 9001:
             NSApp.activate(ignoringOtherApps: true)
             NSApp.terminate(self)
@@ -184,24 +181,23 @@ extension AppDelegate {
 
     private func initAndConfigure() {
         localDB = LocalDB.instantiate(name: coreDataModelName)
-        preferences = Preferences()
+        let preferences = Preferences()
         cloudDB = CloudDB(preferences: preferences)
-        broker = DataBroker(database: localDB, cloudData: cloudDB)
-        windowManager = WindowManager(broker: broker)
-
-        cloudDB.action = { [weak self] event in
-            switch event {
-            case let .updatePage(name: name, record: record):
-                self?.broker.replace(pageNamed: name, withRecord: record)
-            case let .updateMetadata(name: _, record: record):
-                self?.broker.replace(metadata: record)
-            }
-        }
 
         // Experiment: how about we do this rather than pass stuff all over the place?
 
-        Environment.shared.dataBroker = broker
-        Environment.shared.windowManager = windowManager
+        Environment.shared.dataBroker = DataBroker(database: localDB, cloudData: cloudDB)
+        Environment.shared.windowManager =  WindowManager()
+        Environment.shared.preferences = preferences
+
+        cloudDB.action = { event in
+            switch event {
+            case let .updatePage(name: name, record: record):
+                Environment.dataBroker.replace(pageNamed: name, withRecord: record)
+            case let .updateMetadata(name: _, record: record):
+                Environment.dataBroker.replace(metadata: record)
+            }
+        }
     }
 
     private func registerForUrlEvents() {
@@ -216,14 +212,14 @@ extension AppDelegate {
         guard let urlStr = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else { return }
         guard let link = urlStr.removingPercentEncoding else { return }
 
-        if windowManager.isScratchPadLink(link: link) {
-            windowManager.open(link: link)
+        if Environment.windowManager.isScratchPadLink(link: link) {
+            Environment.windowManager.open(link: link)
         }
     }
 
     @objc private func openMainWindow() {
         if isInitialized {
-            windowManager.spawnMainPage()
+            Environment.windowManager.spawnMainPage()
         }
     }
 

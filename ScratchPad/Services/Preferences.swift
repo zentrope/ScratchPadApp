@@ -10,7 +10,7 @@ import Foundation
 import CloudKit
 import os.log
 
-fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "UserDefaults")
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "Preferences")
 
 protocol ScratchPadPrefs {
     var isCustomZoneCreated: Bool { get set }
@@ -22,13 +22,13 @@ protocol ScratchPadPrefs {
 struct Preferences: ScratchPadPrefs {
 
     var isCustomZoneCreated: Bool {
-        get { return UserDefaults.standard.bool(forKey: "IsCustomZoneCreated") }
-        set { UserDefaults.standard.set(newValue, forKey: "IsCustomZoneCreated") }
+        get { return UserDefaults.standard.bool(forKey: "CloudKitIsCustomZoneCreated") }
+        set { UserDefaults.standard.set(newValue, forKey: "CloudKitIsCustomZoneCreated") }
     }
 
     var isSubscribedToPrivateChanges: Bool {
-        get { return UserDefaults.standard.bool(forKey: "isSubscribedToPrivateChanges") }
-        set { UserDefaults.standard.set(newValue, forKey: "isSubscribedToPrivateChanges") }
+        get { return UserDefaults.standard.bool(forKey: "CloudKitIsSubscribedToPrivateChanges") }
+        set { UserDefaults.standard.set(newValue, forKey: "CloudKitIsSubscribedToPrivateChanges") }
     }
 
     var databaseChangeToken: CKServerChangeToken? {
