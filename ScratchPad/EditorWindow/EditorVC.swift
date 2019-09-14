@@ -55,13 +55,13 @@ class EditorVC: NSViewController {
     }
 
     private func updateText(_ string: NSAttributedString) {
-        Environment.dataBroker.update(page: page.name, withText: string)
+        Environment.database.update(page: page.name, withText: string)
     }
 
     private func reloadFromStore() {
         // What if there are local changes not found in the updated version? How
         // do you merge these?
-        self.page = Environment.dataBroker.find(index: page.name)
+        self.page = Environment.database.find(index: page.name)
         editor.attributedString = page.body
     }
 }
@@ -150,7 +150,7 @@ extension EditorVC: NSTextViewDelegate {
         // TODO: This will remove legit http links, too. Hm.
         // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
         source.removeAttribute(.link, range: NSMakeRange(0, source.length))
-        for title in Environment.dataBroker.names {
+        for title in Environment.database.names {
             let link = Environment.windows.makeLink(title)
             do {
                 try source.addLink(word: title, link: link)

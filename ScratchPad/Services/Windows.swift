@@ -46,7 +46,7 @@ class Windows {
             win.window?.makeKeyAndOrderFront(self)
         } else {
             os_log("%{public}s", log: logger, type: .debug, "Spawning new '\(name)' window")
-            spawn(Environment.dataBroker.find(index: name))
+            spawn(Environment.database.find(index: name))
         }
     }
 
@@ -59,7 +59,7 @@ class Windows {
     }
 
     func spawnMainPage() {
-        open(page: Environment.dataBroker.mainPage())
+        open(page: Environment.database.mainPage())
     }
 
     func spawn(_ page: Page) {

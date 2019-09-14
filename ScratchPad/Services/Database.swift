@@ -1,5 +1,5 @@
 //
-//  DataBroker.swift
+//  Database.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 8/24/19.
@@ -12,7 +12,7 @@ import CloudKit
 import os.log
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "DataBroker")
 
-class DataBroker {
+class Database {
 
     let mainPageName = "main"
 
@@ -31,9 +31,9 @@ class DataBroker {
 
     var pages: [Page] { get { return localDB.fetch() } }
 
-    init(database: LocalDB, cloudData: CloudDB) {
-        self.localDB = database
-        self.cloudDB = cloudData
+    init(local: LocalDB, cloud: CloudDB) {
+        self.localDB = local
+        self.cloudDB = cloud
 
         scheduleChangeMonitor()
     }
@@ -57,6 +57,10 @@ class DataBroker {
     func replace(pageNamed name: String, withRecord record: CKRecord) {
         localDB.upsert(page: name, withRecord: record)
         changes.swap { $0.remove(name.lowercased()) }
+    }
+
+    func delete(pageNamed name: String) {
+        localDB.delete(pageNamed: name)
     }
 
     func delete(page: Page) {

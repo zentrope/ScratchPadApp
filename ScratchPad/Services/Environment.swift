@@ -15,9 +15,9 @@ class Environment {
     // Convenience properties to avoid having to call Environment.shared
     // when using features.
 
-    static var dataBroker: DataBroker {
+    static var database: Database {
         get {
-            return shared.dataBroker
+            return shared.database
         }
     }
 
@@ -37,7 +37,7 @@ class Environment {
     }
 
     // The app needs to fail hard if these aren't set
-    var dataBroker: DataBroker!
+    var database: Database!
     var windows: Windows!
     var preferences: ScratchPadPrefs!
 

@@ -33,6 +33,7 @@ class CloudDB {
 
     enum Event {
         case updatePage(name: String, record: CKRecord)
+        case deletePage(name: String)
         case updateMetadata(name: String, record: CKRecord)
     }
 
@@ -180,6 +181,10 @@ extension CloudDB {
         action?(.updatePage(name: name.lowercased(), record: record))
     }
 
+    private func notifyPageDelete(forPageName name: String) {
+        action?(.deletePage(name: name))
+    }
+
     private func notifyMetadataUpdate(forPageName name: String, record: CKRecord) {
         action?(.updateMetadata(name: name.lowercased(), record: record))
     }
@@ -241,7 +246,7 @@ extension CloudDB {
             }
 
             self.preferences.databaseChangeToken = token
-            os_log("%{public}s", log: logger, type: .debug, "Saved database change token")
+            os_log("%{public}s", log: logger, type: .debug, "Saved database change token.")
 
             if changedZoneIDs.isEmpty {
                 os_log("%{public}s", log: logger, type: .debug, "No zones were changed.")
@@ -276,7 +281,12 @@ extension CloudDB {
         }
 
         op.recordWithIDWasDeletedBlock = { recordId, recordType in
-            os_log("%{public}s", log: logger, type: .error, "A request to delete a record arrived, but doing so is not implemented.")
+            guard recordType == "Page" else {
+                os_log("%{public}s", log: logger, type: .error, "Unable to process deletes for record type '\(recordType)'.")
+                return
+            }
+            os_log("%{public}s", log: logger, type: .debug, "Deleting page named '\(recordId.recordName)' as per CloudKit notification.")
+            self.notifyPageDelete(forPageName: recordId.recordName)
         }
 
         op.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in

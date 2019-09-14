@@ -161,16 +161,20 @@ class LocalDB: NSPersistentContainer {
         }
     }
 
-    func delete(page: Page) {
+    func delete(pageNamed name: String) {
         viewContext.perform {
-            if let pageMO = self.fetchMO(page: page.name) {
+            if let pageMO = self.fetchMO(page: name) {
                 self.viewContext.delete(pageMO)
             }
-            if let recordMO = self.fetchMO(metadata: page.name) {
+            if let recordMO = self.fetchMO(metadata: name) {
                 self.viewContext.delete(recordMO)
             }
             self.commit()
         }
+    }
+
+    func delete(page: Page) {
+        delete(pageNamed: page.name)
     }
 
     // MARK: - Queries

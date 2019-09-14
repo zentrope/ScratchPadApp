@@ -121,7 +121,7 @@ class PageBrowserVC: NSViewController {
     }
 
     private func reload() {
-        let data = Environment.dataBroker.pages
+        let data = Environment.database.pages
         pages = data.sorted(by: { $0.dateUpdated > $1.dateUpdated })
         tableView.reloadData()
     }
@@ -156,7 +156,7 @@ extension PageBrowserVC {
         guard tableView.clickedRow > -1 else { return }
         let page = pages[tableView.clickedRow]
         Environment.windows.disappear(pageNamed: page.name)
-        Environment.dataBroker.delete(page: page)
+        Environment.database.delete(page: page)
         NotificationCenter.default.post(name: .cloudDataChanged, object: self)
     }
 
@@ -175,7 +175,7 @@ extension PageBrowserVC {
     @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard menuItem.action == #selector(deletePageClicked(_:)) else { return true }
         let clickedPageName = pages[tableView.clickedRow].name
-        let mainPageName = Environment.dataBroker.mainPageName
+        let mainPageName = Environment.database.mainPageName
         return !(clickedPageName == mainPageName)
     }
 }

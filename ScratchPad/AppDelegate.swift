@@ -55,7 +55,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func application(_ application: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        os_log("%{public}s", log: logger, "received a remote device token")
+        os_log("%{public}s", log: logger, "Received a remote device token.")
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
@@ -186,16 +186,18 @@ extension AppDelegate {
 
         // Experiment: how about we do this rather than pass stuff all over the place? When testing, set this up with mocks (or whatever) and fire away. Advantage: don't have to pass unused dependencies down a chain of objects. Disadvantage: difficult to tell at a glance what depends on what.
 
-        Environment.shared.dataBroker = DataBroker(database: localDB, cloudData: cloudDB)
+        Environment.shared.database = Database(local: localDB, cloud: cloudDB)
         Environment.shared.windows =  Windows()
         Environment.shared.preferences = preferences
 
         cloudDB.action = { event in
             switch event {
             case let .updatePage(name: name, record: record):
-                Environment.dataBroker.replace(pageNamed: name, withRecord: record)
+                Environment.database.replace(pageNamed: name, withRecord: record)
+            case let .deletePage(name: name):
+                Environment.database.delete(pageNamed: name)
             case let .updateMetadata(name: _, record: record):
-                Environment.dataBroker.replace(metadata: record)
+                Environment.database.replace(metadata: record)
             }
         }
     }
