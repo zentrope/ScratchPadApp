@@ -68,6 +68,18 @@ class CloudDB {
         }
     }
 
+    func delete(record meta: RecordMetadata) {
+        let recordID = meta.record.recordID
+        privateDB.delete(withRecordID: recordID) { (recordId, error) in
+            if let error = error {
+                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
+                return
+            }
+            let msg = String(describing: recordId)
+            os_log("%{public}s", log: logger, type: .debug, "Deleted record: '\(msg)'.")
+        }
+    }
+
     // Should take a completion handler.
     func create(page: Page) {
 
@@ -75,8 +87,6 @@ class CloudDB {
             os_log("%{public}s", log: logger, type: .error, "Unable to convert Page body to string.")
             return
         }
-
-        let db = CKContainer.default().privateCloudDatabase
 
         let id = CKRecord.ID(recordName: page.name, zoneID: CloudDB.zoneID)
         let type = "Page"
@@ -87,7 +97,7 @@ class CloudDB {
         record["dateCreated"] = page.dateCreated
         record["dateUpdated"] = page.dateUpdated
 
-        db.save(record) { (savedRecord, error) in
+        privateDB.save(record) { (savedRecord, error) in
             if let error = error {
                 os_log("%{public}s", log: logger, type: .error, "\(error)")
                 return

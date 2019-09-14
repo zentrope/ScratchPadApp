@@ -1,5 +1,5 @@
 //
-//  EditorViewController.swift
+//  EditorVC.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 8/22/19.
@@ -11,7 +11,7 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "EditorViewController")
 
-class EditorViewController: NSViewController {
+class EditorVC: NSViewController {
 
     private let editor = EditorTextView()
 
@@ -80,7 +80,7 @@ extension NSMenu {
 
 // MARK: - NSTextViewDelegate
 
-extension EditorViewController: NSTextViewDelegate {
+extension EditorVC: NSTextViewDelegate {
 
     @objc func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()

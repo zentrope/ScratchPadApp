@@ -82,7 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate {
 
     @IBAction func openPageBrowserWindow(_ sender: NSMenuItem) {
-        PageBrowserWindowController.open()
+        PageBrowserWC.open()
     }
 }
 
@@ -201,7 +201,6 @@ extension AppDelegate {
         // Experiment: how about we do this rather than pass stuff all over the place?
 
         Environment.shared.dataBroker = broker
-        Environment.shared.localDB = localDB
         Environment.shared.windowManager = windowManager
     }
 

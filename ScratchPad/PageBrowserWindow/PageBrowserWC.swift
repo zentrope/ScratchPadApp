@@ -1,5 +1,5 @@
 //
-//  PageBrowserWindowController.swift
+//  PageBrowserWC.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 9/11/19.
@@ -8,27 +8,27 @@
 
 import Cocoa
 
-class PageBrowserWindowController: NSWindowController {
+class PageBrowserWC: NSWindowController {
 
     private let autoSaveName = "SPBrowserWindow"
-    private let viewController: PageBrowserViewController
+    private let viewController: PageBrowserVC
 
-    private static var windowController: PageBrowserWindowController?
+    private static var windowController: PageBrowserWC?
 
     static func open() {
         guard windowController == nil else { return }
 
-        let controller = PageBrowserWindowController()
+        let controller = PageBrowserWC()
         controller.window?.makeKeyAndOrderFront(nil)
         windowController = controller
     }
 
     private static func close() {
-        PageBrowserWindowController.windowController = nil
+        PageBrowserWC.windowController = nil
     }
 
     init() {
-        self.viewController = PageBrowserViewController()
+        self.viewController = PageBrowserVC()
 
         let mask: NSWindow.StyleMask = [.closable, .resizable, .titled, .miniaturizable]
         let place = NSMakeRect(300, 300, 300+500, 300+400)
@@ -53,10 +53,10 @@ class PageBrowserWindowController: NSWindowController {
     }
 }
 
-extension PageBrowserWindowController: NSWindowDelegate {
+extension PageBrowserWC: NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window?.saveFrame(usingName: autoSaveName)
-        PageBrowserWindowController.close()
+        PageBrowserWC.close()
     }
 }

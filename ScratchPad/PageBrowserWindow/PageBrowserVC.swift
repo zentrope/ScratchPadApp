@@ -1,5 +1,5 @@
 //
-//  PageBrowserViewController.swift
+//  PageBrowserVC.swift
 //  ScratchPad
 //
 //  Created by Keith Irwin on 9/11/19.
@@ -20,12 +20,14 @@ fileprivate enum ColumnId: String, CaseIterable {
     }
 }
 
-class PageBrowserViewController: NSViewController {
+class PageBrowserVC: NSViewController {
 
     private var scrollView = NSScrollView()
     private var tableView = NSTableView()
+    private var contextMenu = NSMenu()
 
-    var pages = [Page]()
+    private var pages = [Page]()
+    private var observer: NSObjectProtocol?
 
     override func loadView() {
         let view = NSView(frame: .zero)
@@ -62,13 +64,13 @@ class PageBrowserViewController: NSViewController {
         self.view = view
     }
 
-    private var observer: NSObjectProtocol?
-
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.doubleAction = #selector(openPageOnDoubleClick(_:))
+        tableView.menu = contextMenu
+        setupContextMenu()
 
         reload()
 
@@ -119,7 +121,7 @@ class PageBrowserViewController: NSViewController {
     }
 
     private func reload() {
-        let data = Environment.shared.localDB?.fetch() ?? [Page]()
+        let data = Environment.shared.dataBroker?.pages ?? [Page]()
         pages = data.sorted(by: { $0.dateUpdated > $1.dateUpdated })
         tableView.reloadData()
     }
@@ -130,7 +132,55 @@ class PageBrowserViewController: NSViewController {
     }
 }
 
-extension PageBrowserViewController: NSTableViewDelegate {
+// MARK: - Context Menu
+
+extension PageBrowserVC {
+
+    private var openPageMenuItem: NSMenuItem {
+        let item = NSMenuItem()
+        item.title = "Open page"
+        item.action = #selector(openPageClicked(_:))
+        item.target = self
+        return item
+    }
+
+    private var deletePageMenuItem: NSMenuItem {
+        let item = NSMenuItem()
+        item.title = "Delete page"
+        item.action = #selector(deletePageClicked(_:))
+        item.target = self
+        return item
+    }
+
+    @objc private func deletePageClicked(_ sender: NSMenuItem) {
+        guard tableView.clickedRow > -1 else { return }
+        let page = pages[tableView.clickedRow]
+        Environment.shared.windowManager?.disappear(pageNamed: page.name)
+        Environment.shared.dataBroker?.delete(page: page)
+        NotificationCenter.default.post(name: .cloudDataChanged, object: self)
+    }
+
+    @objc private func openPageClicked(_ sender: NSMenuItem) {
+        let row = tableView.clickedRow
+        guard row > -1 else { return }
+        let name = pages[row].name
+        Environment.shared.windowManager?.open(name: name)
+    }
+
+    private func setupContextMenu() {
+        contextMenu.addItem(openPageMenuItem)
+        contextMenu.addItem(deletePageMenuItem)
+    }
+
+    @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        guard menuItem.action == #selector(deletePageClicked(_:)) else { return true }
+        let clickedPageName = pages[tableView.clickedRow].name
+        let mainPageName = Environment.shared.dataBroker?.mainPageName ?? "main"
+        return !(clickedPageName == mainPageName)
+    }
+}
+
+extension PageBrowserVC: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let identifier = tableColumn?.identifier else { return nil }
@@ -153,10 +203,9 @@ extension PageBrowserViewController: NSTableViewDelegate {
         cell.text.stringValue = text
         return cell
     }
-
 }
 
-extension PageBrowserViewController: NSTableViewDataSource {
+extension PageBrowserVC: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
         return pages.count

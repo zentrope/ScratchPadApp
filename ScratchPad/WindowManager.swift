@@ -15,7 +15,7 @@ class WindowManager {
 
     static let linkSchema = "scratchpad://" // Defined in info.plist, probably should be pulled from Bundle in an extension
 
-    private var windows = [String:EditorWindowController]()
+    private var windows = [String:EditorWC]()
     private var broker: DataBroker
 
     var count: Int {
@@ -65,7 +65,7 @@ class WindowManager {
     }
 
     func spawn(_ page: Page) {
-        let c = EditorWindowController(broker: broker, page: page, windowManager: self)
+        let c = EditorWC(broker: broker, page: page, windowManager: self)
         c.window?.makeKeyAndOrderFront(self)
         windows[page.name] = c
     }
@@ -78,6 +78,15 @@ class WindowManager {
         }
     }
 
+    func disappear(pageNamed name: String) {
+        if let win = windows[name]?.window {
+            if win.isVisible {
+                win.close()
+            }
+        }
+    }
+
+    // The semantics here are messed up, i.e., confusing.
     func close(pageNamed name: String) {
         os_log("%{public}s", log: logger, type: .debug, "Closing '\(name)' window.")
         windows.removeValue(forKey: name)

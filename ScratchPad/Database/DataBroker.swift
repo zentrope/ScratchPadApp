@@ -14,12 +14,12 @@ fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, categor
 
 class DataBroker {
 
-    private let mainArticleIndex = "main"
+    let mainPageName = "main"
 
     private var localDB: LocalDB!
     private var cloudDB: CloudDB!
 
-    // Cache so we can lazily update the cloud, for now.
+    // Cache so we can lazily update the cloud until I understand a better way to do this.
     private var changes = Atomic(Set<String>())
 
     // Names are used to create links in page text for clickable navigation
@@ -28,6 +28,8 @@ class DataBroker {
             return localDB.fetchNames()
         }
     }
+
+    var pages: [Page] { get { return localDB.fetch() } }
 
     init(database: LocalDB, cloudData: CloudDB) {
         self.localDB = database
@@ -38,7 +40,7 @@ class DataBroker {
 
     /// Return the main/initial article
     func mainPage() -> Page {
-        return find(index: mainArticleIndex)
+        return find(index: mainPageName)
     }
 
     func find(index: String) -> Page {
@@ -55,6 +57,13 @@ class DataBroker {
     func replace(pageNamed name: String, withRecord record: CKRecord) {
         localDB.upsert(page: name, withRecord: record)
         changes.swap { $0.remove(name.lowercased()) }
+    }
+
+    func delete(page: Page) {
+        if let record = localDB.fetch(metadata: page.name) {
+            cloudDB.delete(record: record)
+        }
+        localDB.delete(page: page)
     }
 
     func update(page name: String, withText text: NSAttributedString) {
@@ -121,7 +130,7 @@ class DataBroker {
     }
 
     private func makePage(name: String) -> Page {
-        let message = name.lowercased() == mainArticleIndex.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
+        let message = name.lowercased() == mainPageName.lowercased() ? "Welcome!\n\n" : "\(name)\n\n"
         let body = NSMutableAttributedString(string: message)
         body.setAttributes(EditorTextView.defaultAttributes, range: NSMakeRange(0, body.length))
 
