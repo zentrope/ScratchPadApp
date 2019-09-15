@@ -52,7 +52,7 @@ class PageBrowserVC: NSViewController {
 
         view.addSubview(scrollView)
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -1),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -150,8 +150,14 @@ extension PageBrowserVC {
     @objc private func deletePageClicked(_ sender: NSMenuItem) {
         guard tableView.clickedRow > -1 else { return }
         let page = pages[tableView.clickedRow]
-        Environment.windows.disappear(pageNamed: page.name)
-        Environment.database.delete(page: page)
+        let title = "Delete \(page.name.capitalized)"
+        let question = "Delete the ScratchPad named '\(page.name)'?"
+        self.view.window?.confirm(title: title, question: question, { affirmative in
+            if affirmative {
+                Environment.windows.disappear(pageNamed: page.name)
+                Environment.database.delete(page: page)
+            }
+        })
     }
 
     @objc private func openPageClicked(_ sender: NSMenuItem) {
@@ -173,6 +179,8 @@ extension PageBrowserVC {
         return !(clickedPageName == mainPageName)
     }
 }
+
+// MARK: - NSTableViewDelegate
 
 extension PageBrowserVC: NSTableViewDelegate {
 
@@ -199,12 +207,16 @@ extension PageBrowserVC: NSTableViewDelegate {
     }
 }
 
+// MARK: - NSTableViewDataSource
+
 extension PageBrowserVC: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
         return pages.count
     }
 }
+
+// MARK: - Cell
 
 class Cell: NSTableCellView {
 

@@ -25,7 +25,7 @@ struct Preferences: ScratchPadPrefs {
 
     func removeWindowFramePosition(withName name: String) {
         let key = "NSWindow Frame \(name)"
-        print("removing key '\(key)'")
+        os_log("%{public}s", log: logger, type: .debug, "Removing auto-save '\(key)' from user defaults.")
         UserDefaults.standard.removeObject(forKey: key)
     }
 

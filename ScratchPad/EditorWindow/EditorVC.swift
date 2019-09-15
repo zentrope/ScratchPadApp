@@ -17,6 +17,7 @@ class EditorVC: NSViewController {
 
     private var page: Page
     private var changeObserver: NSObjectProtocol?
+    private var remoteChangeObserver: NSObjectProtocol?
 
     init(page: Page) {
         self.page = page
@@ -50,22 +51,19 @@ class EditorVC: NSViewController {
         super.viewDidLoad()
         editor.textView.delegate = self
 
+        remoteChangeObserver = NotificationCenter.default.addObserver(forName: .cloudDatabaseDidChange, object: nil, queue: .main, using: { [weak self] _ in
+            self?.reloadFromStore()
+        })
+
         changeObserver = NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) { [weak self] msg in
             guard let self = self else { return }
-            guard let packet = msg.userInfo?["updates"] as? DataUpdatePacket else { return }
-
-            let ourPageName = self.page.name
-            let changed = Set(packet.updates.map { $0.name } + packet.inserts.map { $0.name })
-            if changed.contains(ourPageName) {
-                self.reloadFromStore()
-            }
             self.render(self.editor.textView)
         }
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        NotificationCenter.default.removeObserver(changeObserver)
+        NotificationCenter.default.removeObservers([changeObserver, remoteChangeObserver])
     }
 
     private func updateText(_ string: NSAttributedString) {
@@ -73,8 +71,7 @@ class EditorVC: NSViewController {
     }
 
     private func reloadFromStore() {
-        // What if there are local changes not found in the updated version? How
-        // do you merge these?
+        // Should only be invoked when a cloud sync comes in.
         self.page = Environment.database.find(index: page.name)
         editor.attributedString = page.body
     }

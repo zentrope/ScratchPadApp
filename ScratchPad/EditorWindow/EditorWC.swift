@@ -27,7 +27,7 @@ class EditorWC: NSWindowController {
 
         super.init(window: window)
 
-        window.title = page.name
+        window.title = "ScratchPad — \(page.name)"
         window.titleVisibility = .visible
         window.contentViewController = self.controller
         window.isReleasedWhenClosed = false

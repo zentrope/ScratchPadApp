@@ -38,7 +38,7 @@ class PageBrowserWC: NSWindowController {
 
         window.delegate = self
         window.contentViewController = viewController
-        window.title = "Page Browser"
+        window.title = "ScratchPad Browser"
         window.titleVisibility = .visible
         window.isReleasedWhenClosed = false
         window.setFrameAutosaveName(autoSaveName)

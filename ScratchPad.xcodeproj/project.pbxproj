@@ -10,6 +10,7 @@
 		53054B23231B7A550063781E /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53054B22231B7A550063781E /* Atomic.swift */; };
 		5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94223242B7700504A5B /* NSImage+Extension.swift */; };
 		5318C94523243CE700504A5B /* NSMenuItem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */; };
+		533563A2232E071C009C13E3 /* NSWindow+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533563A1232E071C009C13E3 /* NSWindow+Ext.swift */; };
 		533FD2F62312091F00A0020E /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* Database.swift */; };
 		534230072329FE160056B1E9 /* PageBrowserWC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534230062329FE160056B1E9 /* PageBrowserWC.swift */; };
 		53423009232A06E20056B1E9 /* PageBrowserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53423008232A06E20056B1E9 /* PageBrowserVC.swift */; };
@@ -41,6 +42,7 @@
 		53054B22231B7A550063781E /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
 		5318C94223242B7700504A5B /* NSImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Extension.swift"; sourceTree = "<group>"; };
 		5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Extension.swift"; sourceTree = "<group>"; };
+		533563A1232E071C009C13E3 /* NSWindow+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSWindow+Ext.swift"; sourceTree = "<group>"; };
 		533FD2F52312091F00A0020E /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		534230062329FE160056B1E9 /* PageBrowserWC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageBrowserWC.swift; sourceTree = "<group>"; };
 		53423008232A06E20056B1E9 /* PageBrowserVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageBrowserVC.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
 				5318C94223242B7700504A5B /* NSImage+Extension.swift */,
 				5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */,
+				533563A1232E071C009C13E3 /* NSWindow+Ext.swift */,
 				5342300C232A10280056B1E9 /* String+Extension.swift */,
 			);
 			path = "Extensions and Utilities";
@@ -305,6 +308,7 @@
 				5364571F2320C96A006C1CFE /* NSAttributedString+Extension.swift in Sources */,
 				534230072329FE160056B1E9 /* PageBrowserWC.swift in Sources */,
 				53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */,
+				533563A2232E071C009C13E3 /* NSWindow+Ext.swift in Sources */,
 				5342300B232A0A2B0056B1E9 /* Environment.swift in Sources */,
 				5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */,
 				53490C91231253D300016DC2 /* Windows.swift in Sources */,

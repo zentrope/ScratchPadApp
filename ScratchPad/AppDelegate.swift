@@ -37,6 +37,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.isInitialized = true
             self.makeStatusBarItem()
             self.openMainWindow()
+            NotificationCenter.default.post(name: .cloudDatabaseDidChange, object: self)
         }
     }
 
@@ -65,11 +66,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String : Any]) {
         os_log("%{public}s", log: logger, "Received a remote notification about an iCloud update.")
         let dict = userInfo as! [String:NSObject]
-        guard let notification: CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else {
-            return }
+        guard let notification: CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else { return }
         cloudDB.fetchChanges(in: notification.databaseScope) {
-            os_log("%{public}s", log: logger, "Completed change fetches due to push notification.")
-            
+            os_log("%{public}s", log: logger, "Completed iCloud fetches due to push notification.")
+            NotificationCenter.default.post(name: .cloudDatabaseDidChange, object: self)
         }
     }
 }
@@ -92,6 +92,7 @@ extension AppDelegate {
         Environment.preferences.databaseChangeToken = nil
         cloudDB.fetchChanges(in: .private) {
             os_log("%{public}s", log: logger, "Develop menu: refreshAllFromCloud completed.")
+            NotificationCenter.default.post(name: .cloudDatabaseDidChange, object: self)
         }
     }
 
@@ -121,7 +122,7 @@ extension AppDelegate {
     private func makeHelperMenu(includeQuit: Bool = false) -> NSMenu {
         let openMain = NSMenuItem(title: "Main ScratchPad", action: #selector(statusBarMenuSelected), keyEquivalent: "", tag: 1001)
 
-        let openPageBrowser = NSMenuItem(title: "Page Browser", action: #selector(statusBarMenuSelected(_:)), keyEquivalent: "b", tag: 1002)
+        let openPageBrowser = NSMenuItem(title: "ScratchPad Browser", action: #selector(statusBarMenuSelected(_:)), keyEquivalent: "b", tag: 1002)
         openPageBrowser.keyEquivalentModifierMask = [.option, .command]
 
         let scratchPadSelector = NSMenuItem(title: "ScratchPads", action: nil, keyEquivalent: "")
