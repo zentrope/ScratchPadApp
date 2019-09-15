@@ -49,8 +49,16 @@ class EditorVC: NSViewController {
         super.viewDidLoad()
         editor.textView.delegate = self
 
-        NotificationCenter.default.addObserver(forName: .cloudDataChanged, object: nil, queue: .main) { [weak self] _ in
-            self?.reloadFromStore()
+        NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) { [weak self] msg in
+            guard let self = self else { return }
+            guard let packet = msg.userInfo?["updates"] as? DataUpdatePacket else { return }
+
+            let ourPageName = self.page.name
+            let changed = Set(packet.updates.map { $0.name } + packet.inserts.map { $0.name })
+            if changed.contains(ourPageName) {
+                self.reloadFromStore()
+            }
+            self.render(self.editor.textView)
         }
     }
 

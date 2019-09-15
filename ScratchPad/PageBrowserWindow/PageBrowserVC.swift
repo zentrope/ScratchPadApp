@@ -27,7 +27,6 @@ class PageBrowserVC: NSViewController {
     private var contextMenu = NSMenu()
 
     private var pages = [Page]()
-    private var observer: NSObjectProtocol?
 
     override func loadView() {
         let view = NSView(frame: .zero)
@@ -74,27 +73,18 @@ class PageBrowserVC: NSViewController {
 
         reload()
 
-        observer = NotificationCenter.default.addObserver(forName: .localDatabaseUpdated, object: nil, queue: .main) {
+        NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) {
             [weak self] msg in
             guard let info = msg.userInfo else { return }
-
-            // Doing a single reload is fine for this app, but I want to see what this looks like.
-            self?.reload(updates: info[NSUpdatedObjectsKey] as? [Page] ?? [Page](),
-                         deletes: info[NSDeletedObjectsKey] as? [Page] ?? [Page](),
-                         inserts: info[NSInsertedObjectsKey] as? [Page] ?? [Page]())
+            guard let packet = info["updates"] as? DataUpdatePacket else { return }
+            self?.reload(packet: packet)
         }
     }
 
-    override func viewDidDisappear() {
-        if let observer = observer {
-            NotificationCenter.default.removeObserver(observer, name: .localDatabaseUpdated, object: nil)
-        }
-    }
+    private func reload(packet: DataUpdatePacket) {
+        let updatesDict = packet.updates.reduce(into: [String:Page]()) { (accum, page) in accum[page.name] = page }
 
-    private func reload(updates: [Page], deletes: [Page], inserts: [Page]) {
-        let updatesDict = updates.reduce(into: [String:Page]()) { (accum, page) in accum[page.name] = page }
-
-        let deleteDict = deletes.reduce(into: [String:Page]()) { (accum, page) in accum[page.name] = page }
+        let deleteDict = packet.deletes.reduce(into: [String:Page]()) { (accum, page) in accum[page.name] = page }
 
         let cols = IndexSet(integersIn: 0..<self.tableView.tableColumns.count)
 
@@ -111,8 +101,7 @@ class PageBrowserVC: NSViewController {
             self.pages.remove(at: row)
         }
 
-
-        inserts.forEach {
+        packet.inserts.forEach {
             self.pages.insert($0, at: 0)
             self.tableView.insertRows(at: [0], withAnimation: .effectFade)
         }
@@ -157,7 +146,6 @@ extension PageBrowserVC {
         let page = pages[tableView.clickedRow]
         Environment.windows.disappear(pageNamed: page.name)
         Environment.database.delete(page: page)
-        NotificationCenter.default.post(name: .cloudDataChanged, object: self)
     }
 
     @objc private func openPageClicked(_ sender: NSMenuItem) {

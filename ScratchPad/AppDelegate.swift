@@ -69,7 +69,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return }
         cloudDB.fetchChanges(in: notification.databaseScope) {
             os_log("%{public}s", log: logger, "Completed change fetches due to push notification.")
-            NotificationCenter.default.post(name: .cloudDataChanged, object: self)
+            
         }
     }
 }
@@ -92,7 +92,6 @@ extension AppDelegate {
         Environment.preferences.databaseChangeToken = nil
         cloudDB.fetchChanges(in: .private) {
             os_log("%{public}s", log: logger, "Develop menu: refreshAllFromCloud completed.")
-            NotificationCenter.default.post(name: .cloudDataChanged, object: self)
         }
     }
 

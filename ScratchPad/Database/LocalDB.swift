@@ -32,7 +32,6 @@ extension RecordMetadata {
     }
 }
 
-
 /// A class for interacting with the local data store.
 ///
 /// - Note: Only this class should interact with Core Data and Managed Objects directly. The rest of the application should use value structs for rendering and syncing.
@@ -70,13 +69,9 @@ class LocalDB: NSPersistentContainer {
                 .compactMap { $0 as? PageMO }
                 .map { Page.fromManagedObject(page: $0)} ?? [Page]()
 
-            let info = [
-                NSUpdatedObjectsKey: updates,
-                NSDeletedObjectsKey: deletes,
-                NSInsertedObjectsKey: inserts
-            ]
-
-            NotificationCenter.default.post(name: .localDatabaseUpdated, object: self, userInfo: info)
+            let packet = DataUpdatePacket(updates: updates, inserts: inserts, deletes: deletes)
+            let info = ["updates" : packet]
+            NotificationCenter.default.post(name: .localDatabaseDidChange, object: self, userInfo: info)
         }
 
         return localDB

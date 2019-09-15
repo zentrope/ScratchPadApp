@@ -17,9 +17,17 @@ protocol ScratchPadPrefs {
     var isSubscribedToPrivateChanges: Bool { get set }
     var databaseChangeToken: CKServerChangeToken? { get set }
     var zoneRecordChangeToken: CKServerChangeToken? { get set }
+
+    func removeWindowFramePosition(withName name: String)
 }
 
 struct Preferences: ScratchPadPrefs {
+
+    func removeWindowFramePosition(withName name: String) {
+        let key = "NSWindow Frame \(name)"
+        print("removing key '\(key)'")
+        UserDefaults.standard.removeObject(forKey: key)
+    }
 
     var isCustomZoneCreated: Bool {
         get { return UserDefaults.standard.bool(forKey: "CloudKitIsCustomZoneCreated") }

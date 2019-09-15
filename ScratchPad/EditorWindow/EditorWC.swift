@@ -22,7 +22,7 @@ class EditorWC: NSWindowController {
         let window = NSWindow(contentRect: position, styleMask: [.closable, .resizable, .titled, .miniaturizable], backing: .buffered, defer: true)
 
         self.pageName = page.name
-        self.saveName = NSWindow.FrameAutosaveName("SPEditorWindow.\(pageName)")
+        self.saveName = Environment.windows.makeAutosaveName(forPageNamed: pageName)
         self.controller = EditorVC(page: page)
 
         super.init(window: window)

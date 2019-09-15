@@ -24,6 +24,14 @@ class Windows {
     init() {
     }
 
+    func makeAutosaveName(forPageNamed name: String) -> String {
+        return "SPEditorWindow.\(name)"
+    }
+
+    func removeAutosave(forPageNamed name: String) {
+        Environment.preferences.removeWindowFramePosition(withName: makeAutosaveName(forPageNamed: name))
+    }
+
     func isScratchPadLink(link: String) -> Bool {
         return link.lowercased().hasPrefix(Windows.linkSchema)
     }

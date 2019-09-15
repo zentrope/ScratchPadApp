@@ -25,6 +25,7 @@
 		538F974A231E1BC8006D8734 /* LocalDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9749231E1BC8006D8734 /* LocalDB.swift */; };
 		539A73F3231A34C1005E2788 /* CloudDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539A73F2231A34C1005E2788 /* CloudDB.swift */; };
 		53B27C88232D6C8A0057EE7C /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B27C87232D6C8A0057EE7C /* Notifications.swift */; };
+		53B27C8A232DC2B10057EE7C /* DataUpdatePacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B27C89232DC2B10057EE7C /* DataUpdatePacket.swift */; };
 		53BD45CC2311B36500712A61 /* EditorWC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BD45CB2311B36500712A61 /* EditorWC.swift */; };
 		53DD107E231633E500D4E98D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53DD107D231633E500D4E98D /* CloudKit.framework */; };
 		53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53DF04AD231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld */; };
@@ -55,6 +56,7 @@
 		538F9749231E1BC8006D8734 /* LocalDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDB.swift; sourceTree = "<group>"; };
 		539A73F2231A34C1005E2788 /* CloudDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudDB.swift; sourceTree = "<group>"; };
 		53B27C87232D6C8A0057EE7C /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		53B27C89232DC2B10057EE7C /* DataUpdatePacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataUpdatePacket.swift; sourceTree = "<group>"; };
 		53BD45CB2311B36500712A61 /* EditorWC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorWC.swift; sourceTree = "<group>"; };
 		53DD107D231633E500D4E98D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		53DF04AE231CAF8D00B29AEC /* ScratchPadModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ScratchPadModel.xcdatamodel; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 		536457192320BCD7006C1CFE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				53B27C89232DC2B10057EE7C /* DataUpdatePacket.swift */,
 				5364571A2320BCFE006C1CFE /* Page.swift */,
 				53FC14E223237B180034B9F1 /* PageUpdate.swift */,
 				5364571C2320BEE7006C1CFE /* RecordMetadata.swift */,
@@ -295,6 +298,7 @@
 				5342300D232A10280056B1E9 /* String+Extension.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				5364571B2320BCFE006C1CFE /* Page.swift in Sources */,
+				53B27C8A232DC2B10057EE7C /* DataUpdatePacket.swift in Sources */,
 				5342300F232A13060056B1E9 /* Date+Extension.swift in Sources */,
 				533FD2F62312091F00A0020E /* Database.swift in Sources */,
 				53423009232A06E20056B1E9 /* PageBrowserVC.swift in Sources */,

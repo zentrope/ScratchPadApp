@@ -61,6 +61,7 @@ class Database {
 
     func delete(pageNamed name: String) {
         localDB.delete(pageNamed: name)
+        Environment.windows.removeAutosave(forPageNamed: name)
     }
 
     func delete(page: Page) {
@@ -68,6 +69,7 @@ class Database {
             cloudDB.delete(record: record)
         }
         localDB.delete(page: page)
+        Environment.windows.removeAutosave(forPageNamed: page.name)
     }
 
     func update(page name: String, withText text: NSAttributedString) {
