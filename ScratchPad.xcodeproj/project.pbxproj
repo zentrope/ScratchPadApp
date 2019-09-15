@@ -8,19 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		53054B23231B7A550063781E /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53054B22231B7A550063781E /* Atomic.swift */; };
-		5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94223242B7700504A5B /* NSImage+Extension.swift */; };
-		5318C94523243CE700504A5B /* NSMenuItem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */; };
+		5318C94323242B7700504A5B /* NSImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94223242B7700504A5B /* NSImage+Ext.swift */; };
+		5318C94523243CE700504A5B /* NSMenuItem+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5318C94423243CE700504A5B /* NSMenuItem+Ext.swift */; };
 		533563A2232E071C009C13E3 /* NSWindow+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533563A1232E071C009C13E3 /* NSWindow+Ext.swift */; };
 		533FD2F62312091F00A0020E /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533FD2F52312091F00A0020E /* Database.swift */; };
 		534230072329FE160056B1E9 /* PageBrowserWC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534230062329FE160056B1E9 /* PageBrowserWC.swift */; };
 		53423009232A06E20056B1E9 /* PageBrowserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53423008232A06E20056B1E9 /* PageBrowserVC.swift */; };
 		5342300B232A0A2B0056B1E9 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300A232A0A2B0056B1E9 /* Environment.swift */; };
-		5342300D232A10280056B1E9 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300C232A10280056B1E9 /* String+Extension.swift */; };
-		5342300F232A13060056B1E9 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300E232A13060056B1E9 /* Date+Extension.swift */; };
+		5342300D232A10280056B1E9 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300C232A10280056B1E9 /* String+Ext.swift */; };
+		5342300F232A13060056B1E9 /* Date+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342300E232A13060056B1E9 /* Date+Ext.swift */; };
 		53490C91231253D300016DC2 /* Windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53490C90231253D300016DC2 /* Windows.swift */; };
 		5364571B2320BCFE006C1CFE /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571A2320BCFE006C1CFE /* Page.swift */; };
 		5364571D2320BEE7006C1CFE /* RecordMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571C2320BEE7006C1CFE /* RecordMetadata.swift */; };
-		5364571F2320C96A006C1CFE /* NSAttributedString+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */; };
+		5364571F2320C96A006C1CFE /* NSAttributedString+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364571E2320C96A006C1CFE /* NSAttributedString+Ext.swift */; };
 		537B11102318E47F00D49732 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537B110F2318E47F00D49732 /* Preferences.swift */; };
 		538F9748231E1534006D8734 /* CKMetadataValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */; };
 		538F974A231E1BC8006D8734 /* LocalDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9749231E1BC8006D8734 /* LocalDB.swift */; };
@@ -40,19 +40,19 @@
 
 /* Begin PBXFileReference section */
 		53054B22231B7A550063781E /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
-		5318C94223242B7700504A5B /* NSImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Extension.swift"; sourceTree = "<group>"; };
-		5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Extension.swift"; sourceTree = "<group>"; };
+		5318C94223242B7700504A5B /* NSImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Ext.swift"; sourceTree = "<group>"; };
+		5318C94423243CE700504A5B /* NSMenuItem+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Ext.swift"; sourceTree = "<group>"; };
 		533563A1232E071C009C13E3 /* NSWindow+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSWindow+Ext.swift"; sourceTree = "<group>"; };
 		533FD2F52312091F00A0020E /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		534230062329FE160056B1E9 /* PageBrowserWC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageBrowserWC.swift; sourceTree = "<group>"; };
 		53423008232A06E20056B1E9 /* PageBrowserVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageBrowserVC.swift; sourceTree = "<group>"; };
 		5342300A232A0A2B0056B1E9 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
-		5342300C232A10280056B1E9 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		5342300E232A13060056B1E9 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
+		5342300C232A10280056B1E9 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
+		5342300E232A13060056B1E9 /* Date+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Ext.swift"; sourceTree = "<group>"; };
 		53490C90231253D300016DC2 /* Windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Windows.swift; sourceTree = "<group>"; };
 		5364571A2320BCFE006C1CFE /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		5364571C2320BEE7006C1CFE /* RecordMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordMetadata.swift; sourceTree = "<group>"; };
-		5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extension.swift"; sourceTree = "<group>"; };
+		5364571E2320C96A006C1CFE /* NSAttributedString+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Ext.swift"; sourceTree = "<group>"; };
 		537B110F2318E47F00D49732 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		538F9747231E1534006D8734 /* CKMetadataValueTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKMetadataValueTransformer.swift; sourceTree = "<group>"; };
 		538F9749231E1BC8006D8734 /* LocalDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDB.swift; sourceTree = "<group>"; };
@@ -120,13 +120,13 @@
 			isa = PBXGroup;
 			children = (
 				53054B22231B7A550063781E /* Atomic.swift */,
-				5342300E232A13060056B1E9 /* Date+Extension.swift */,
+				5342300E232A13060056B1E9 /* Date+Ext.swift */,
 				53B27C87232D6C8A0057EE7C /* Notifications.swift */,
-				5364571E2320C96A006C1CFE /* NSAttributedString+Extension.swift */,
-				5318C94223242B7700504A5B /* NSImage+Extension.swift */,
-				5318C94423243CE700504A5B /* NSMenuItem+Extension.swift */,
+				5364571E2320C96A006C1CFE /* NSAttributedString+Ext.swift */,
+				5318C94223242B7700504A5B /* NSImage+Ext.swift */,
+				5318C94423243CE700504A5B /* NSMenuItem+Ext.swift */,
 				533563A1232E071C009C13E3 /* NSWindow+Ext.swift */,
-				5342300C232A10280056B1E9 /* String+Extension.swift */,
+				5342300C232A10280056B1E9 /* String+Ext.swift */,
 			);
 			path = "Extensions and Utilities";
 			sourceTree = "<group>";
@@ -298,19 +298,19 @@
 				537B11102318E47F00D49732 /* Preferences.swift in Sources */,
 				53EDDFD62311A94500E2FABB /* EditorTextView.swift in Sources */,
 				539A73F3231A34C1005E2788 /* CloudDB.swift in Sources */,
-				5342300D232A10280056B1E9 /* String+Extension.swift in Sources */,
+				5342300D232A10280056B1E9 /* String+Ext.swift in Sources */,
 				53EA43D0230F85C700019BE2 /* AppDelegate.swift in Sources */,
 				5364571B2320BCFE006C1CFE /* Page.swift in Sources */,
 				53B27C8A232DC2B10057EE7C /* DataUpdatePacket.swift in Sources */,
-				5342300F232A13060056B1E9 /* Date+Extension.swift in Sources */,
+				5342300F232A13060056B1E9 /* Date+Ext.swift in Sources */,
 				533FD2F62312091F00A0020E /* Database.swift in Sources */,
 				53423009232A06E20056B1E9 /* PageBrowserVC.swift in Sources */,
-				5364571F2320C96A006C1CFE /* NSAttributedString+Extension.swift in Sources */,
+				5364571F2320C96A006C1CFE /* NSAttributedString+Ext.swift in Sources */,
 				534230072329FE160056B1E9 /* PageBrowserWC.swift in Sources */,
 				53DF04AF231CAF8D00B29AEC /* ScratchPadModel.xcdatamodeld in Sources */,
 				533563A2232E071C009C13E3 /* NSWindow+Ext.swift in Sources */,
 				5342300B232A0A2B0056B1E9 /* Environment.swift in Sources */,
-				5318C94323242B7700504A5B /* NSImage+Extension.swift in Sources */,
+				5318C94323242B7700504A5B /* NSImage+Ext.swift in Sources */,
 				53490C91231253D300016DC2 /* Windows.swift in Sources */,
 				53BD45CC2311B36500712A61 /* EditorWC.swift in Sources */,
 				53EA43DE230F86C800019BE2 /* EditorVC.swift in Sources */,
@@ -318,7 +318,7 @@
 				5364571D2320BEE7006C1CFE /* RecordMetadata.swift in Sources */,
 				53054B23231B7A550063781E /* Atomic.swift in Sources */,
 				538F974A231E1BC8006D8734 /* LocalDB.swift in Sources */,
-				5318C94523243CE700504A5B /* NSMenuItem+Extension.swift in Sources */,
+				5318C94523243CE700504A5B /* NSMenuItem+Ext.swift in Sources */,
 				538F9748231E1534006D8734 /* CKMetadataValueTransformer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
