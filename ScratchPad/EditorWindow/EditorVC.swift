@@ -16,6 +16,7 @@ class EditorVC: NSViewController {
     private let editor = EditorTextView()
 
     private var page: Page
+    private var changeObserver: NSObjectProtocol?
 
     init(page: Page) {
         self.page = page
@@ -49,7 +50,7 @@ class EditorVC: NSViewController {
         super.viewDidLoad()
         editor.textView.delegate = self
 
-        NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) { [weak self] msg in
+        changeObserver = NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) { [weak self] msg in
             guard let self = self else { return }
             guard let packet = msg.userInfo?["updates"] as? DataUpdatePacket else { return }
 
@@ -60,6 +61,11 @@ class EditorVC: NSViewController {
             }
             self.render(self.editor.textView)
         }
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        NotificationCenter.default.removeObserver(changeObserver)
     }
 
     private func updateText(_ string: NSAttributedString) {

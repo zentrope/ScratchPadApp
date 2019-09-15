@@ -52,6 +52,7 @@ class LocalDB: NSPersistentContainer {
             }
         }
 
+        // No need to ever remove this observer as this class is meant to last the entire lifetime of the application run.
         NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: localDB.viewContext, queue: .main) { msg in
             // Converting the data into value objects so I can keep managed objects isolate to this file.
 

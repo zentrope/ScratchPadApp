@@ -27,6 +27,7 @@ class PageBrowserVC: NSViewController {
     private var contextMenu = NSMenu()
 
     private var pages = [Page]()
+    private var changeObserver: NSObjectProtocol?
 
     override func loadView() {
         let view = NSView(frame: .zero)
@@ -73,12 +74,17 @@ class PageBrowserVC: NSViewController {
 
         reload()
 
-        NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) {
+        changeObserver = NotificationCenter.default.addObserver(forName: .localDatabaseDidChange, object: nil, queue: .main) {
             [weak self] msg in
             guard let info = msg.userInfo else { return }
             guard let packet = info["updates"] as? DataUpdatePacket else { return }
             self?.reload(packet: packet)
         }
+    }
+
+    override func viewWillDisappear() {
+        super.viewWillDisappear()
+        NotificationCenter.default.removeObserver(changeObserver)
     }
 
     private func reload(packet: DataUpdatePacket) {

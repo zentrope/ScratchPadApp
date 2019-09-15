@@ -14,3 +14,14 @@ extension Notification.Name {
     static let localDatabaseDidChange = Notification.Name("localDatabaseDidChange")
 }
 
+extension NotificationCenter {
+
+    /// Remove the observer if it's not nil.
+    /// - Parameter observer: An optional observer.
+    func removeObserver(_ observer: Any?) {
+        if let observer = observer {
+            removeObserver(observer)
+        }
+    }
+}
+
