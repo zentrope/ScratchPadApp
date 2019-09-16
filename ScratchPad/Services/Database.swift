@@ -61,6 +61,7 @@ class Database {
 
     func delete(pageNamed name: String) {
         localDB.delete(pageNamed: name)
+        Environment.windows.disappear(pageNamed: name)
         Environment.windows.removeAutosave(forPageNamed: name)
     }
 
