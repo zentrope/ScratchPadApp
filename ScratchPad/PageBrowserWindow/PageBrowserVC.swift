@@ -22,6 +22,16 @@ fileprivate enum ColumnId: String, CaseIterable {
     func isInteger() -> Bool {
         return self == .size
     }
+
+    func kvoKey() -> String {
+        switch self {
+        case .name: return "name"
+        case .created: return "dateCreated"
+        case .updated: return "dateUpdated"
+        case .size: return "size"
+        case .snippet: return "snippet"
+        }
+    }
 }
 
 class PageBrowserVC: NSViewController {
@@ -46,7 +56,7 @@ class PageBrowserVC: NSViewController {
             let c = NSTableColumn(identifier: $0.uiid())
             c.title = $0.rawValue
             c.headerCell.isBordered = true
-            c.sortDescriptorPrototype = NSSortDescriptor(key: $0.rawValue, ascending: true)
+            c.sortDescriptorPrototype = NSSortDescriptor(key: $0.kvoKey(), ascending: true)
             if $0.isInteger() {
                 c.headerCell.alignment = .right
             }
@@ -218,19 +228,6 @@ extension PageBrowserVC: NSTableViewDelegate {
         return cell
     }
 
-    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-        guard let spec = tableView.sortDescriptors.first else { return }
-        guard let key = spec.key else { return }
-        switch ColumnId(rawValue: key) {
-        case .name:    pages = pages.sorted(by: \.name,        ascending: spec.ascending)
-        case .created: pages = pages.sorted(by: \.dateCreated, ascending: spec.ascending)
-        case .updated: pages = pages.sorted(by: \.dateUpdated, ascending: spec.ascending)
-        case .size:    pages = pages.sorted(by: \.size,        ascending: spec.ascending)
-        case .snippet: pages = pages.sorted(by: \.snippet,     ascending: spec.ascending)
-        case .none: return
-        }
-        tableView.reloadData()
-    }
 }
 
 // MARK: - NSTableViewDataSource
@@ -239,6 +236,11 @@ extension PageBrowserVC: NSTableViewDataSource {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
         return pages.count
+    }
+
+    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+        pages = NSArray(array: pages).sortedArray(using: tableView.sortDescriptors) as! [Page]
+        tableView.reloadData()
     }
 }
 

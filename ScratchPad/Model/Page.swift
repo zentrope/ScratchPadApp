@@ -8,19 +8,27 @@
 
 import Foundation
 
-struct Page: Hashable {
-    var name: String
-    var dateCreated: Date
-    var dateUpdated: Date
-    var body: NSAttributedString
+// KV Compliant (for sorting in the Page Browser)
+final class Page: NSObject {
+    @objc let name: String
+    @objc let dateCreated: Date
+    @objc let dateUpdated: Date
+    @objc let body: NSAttributedString
 
-    var snippet: String {
+    init(name: String, dateCreated: Date, dateUpdated: Date, body: NSAttributedString) {
+        self.name = name
+        self.dateCreated = dateCreated
+        self.dateUpdated = dateUpdated
+        self.body = body
+    }
+
+    @objc var snippet: String {
         get {
             return body.string.clean().trim(toSize: 300)
         }
     }
 
-    var size: Int {
+    @objc var size: Int {
         get {
             return body.length
         }
