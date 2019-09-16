@@ -18,6 +18,10 @@ fileprivate enum ColumnId: String, CaseIterable {
     func uiid() -> NSUserInterfaceItemIdentifier {
         return NSUserInterfaceItemIdentifier(rawValue: self.rawValue)
     }
+
+    func isInteger() -> Bool {
+        return self == .size
+    }
 }
 
 class PageBrowserVC: NSViewController {
@@ -43,6 +47,9 @@ class PageBrowserVC: NSViewController {
             c.title = $0.rawValue
             c.headerCell.isBordered = true
             c.sortDescriptorPrototype = NSSortDescriptor(key: $0.rawValue, ascending: true)
+            if $0.isInteger() {
+                c.headerCell.alignment = .right
+            }
             tableView.addTableColumn(c)
         }
 
@@ -191,21 +198,23 @@ extension PageBrowserVC: NSTableViewDelegate {
         guard let identifier = tableColumn?.identifier else { return nil }
         guard let column = ColumnId(rawValue: identifier.rawValue) else { return nil }
 
-        let cell = tableView.makeView(withIdentifier: identifier, owner: self) as? Cell ?? Cell(identifier: identifier)
-
-        let page = pages[row]
-
-        let text: String = {
-            switch column {
-            case .name: return page.name
-            case .created: return page.dateCreated.dateAndTime
-            case .updated: return page.dateUpdated.dateAndTime
-            case .size: return "\(page.size)"
-            case .snippet: return page.snippet
+        let cell = tableView.makeView(withIdentifier: identifier, owner: self) as? Cell ?? {
+            if column.isInteger() {
+                return Cell(identifier: identifier, type: .integer)
+            } else {
+                return Cell(identifier: identifier)
             }
         }()
 
-        cell.text.stringValue = text
+        let page = pages[row]
+
+        switch column {
+        case .name: cell.set(page.name)
+        case .created: cell.set(page.dateCreated.dateAndTime)
+        case .updated: cell.set(page.dateUpdated.dateAndTime)
+        case .size: cell.set(page.size)
+        case .snippet: cell.set(page.snippet)
+        }
         return cell
     }
 
@@ -237,15 +246,23 @@ extension PageBrowserVC: NSTableViewDataSource {
 
 class Cell: NSView {
 
-    let text = NSTextField(wrappingLabelWithString: "")
+    enum Kind {
+        case string, integer
+    }
 
-    convenience init(identifier: NSUserInterfaceItemIdentifier) {
+    private let text = NSTextField(wrappingLabelWithString: "")
+
+    convenience init(identifier: NSUserInterfaceItemIdentifier, type: Cell.Kind = .string) {
         self.init(frame: .zero)
 
         text.maximumNumberOfLines = 1
         text.lineBreakMode = .byTruncatingTail
         text.isSelectable = false
         text.translatesAutoresizingMaskIntoConstraints = false
+
+        if type == .integer {
+            text.alignment = .right
+        }
 
         addSubview(text)
 
@@ -254,6 +271,13 @@ class Cell: NSView {
             text.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 4),
             text.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -4),
         ])
+    }
 
+    func set(_ value: String) {
+        text.stringValue = value
+    }
+
+    func set(_ value: Int) {
+        text.integerValue = value
     }
 }
