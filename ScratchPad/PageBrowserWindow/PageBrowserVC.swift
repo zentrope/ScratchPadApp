@@ -42,6 +42,7 @@ class PageBrowserVC: NSViewController {
             let c = NSTableColumn(identifier: $0.uiid())
             c.title = $0.rawValue
             c.headerCell.isBordered = true
+            c.sortDescriptorPrototype = NSSortDescriptor(key: $0.rawValue, ascending: true)
             tableView.addTableColumn(c)
         }
 
@@ -112,7 +113,8 @@ class PageBrowserVC: NSViewController {
             self.tableView.insertRows(at: [0], withAnimation: .effectFade)
         }
 
-        // Call sort descriptor stuff when it's ready
+        // This ends up reloading the table anyway, but at least we get the animation before hand.
+        tableView(tableView, sortDescriptorsDidChange: [])
     }
 
     private func reload() {
@@ -122,6 +124,7 @@ class PageBrowserVC: NSViewController {
     }
 
     @objc private func openPageOnDoubleClick(_ sender: NSTableView) {
+        guard sender.clickedRow > -1 else { return }
         let page = pages[sender.clickedRow]
         Environment.windows.open(name: page.name)
     }
@@ -197,13 +200,27 @@ extension PageBrowserVC: NSTableViewDelegate {
             case .name: return page.name
             case .created: return page.dateCreated.dateAndTime
             case .updated: return page.dateUpdated.dateAndTime
-            case .size: return "\(page.body.length)"
-            case .snippet: return page.body.string.clean().trim(toSize: 300)
+            case .size: return "\(page.size)"
+            case .snippet: return page.snippet
             }
         }()
 
         cell.text.stringValue = text
         return cell
+    }
+
+    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+        guard let spec = tableView.sortDescriptors.first else { return }
+        guard let key = spec.key else { return }
+        switch ColumnId(rawValue: key) {
+        case .name:    pages = pages.sorted(by: \.name,        ascending: spec.ascending)
+        case .created: pages = pages.sorted(by: \.dateCreated, ascending: spec.ascending)
+        case .updated: pages = pages.sorted(by: \.dateUpdated, ascending: spec.ascending)
+        case .size:    pages = pages.sorted(by: \.size,        ascending: spec.ascending)
+        case .snippet: pages = pages.sorted(by: \.snippet,     ascending: spec.ascending)
+        case .none: return
+        }
+        tableView.reloadData()
     }
 }
 
@@ -218,7 +235,7 @@ extension PageBrowserVC: NSTableViewDataSource {
 
 // MARK: - Cell
 
-class Cell: NSTableCellView {
+class Cell: NSView {
 
     let text = NSTextField(wrappingLabelWithString: "")
 

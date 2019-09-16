@@ -13,4 +13,16 @@ struct Page: Hashable {
     var dateCreated: Date
     var dateUpdated: Date
     var body: NSAttributedString
+
+    var snippet: String {
+        get {
+            return body.string.clean().trim(toSize: 300)
+        }
+    }
+
+    var size: Int {
+        get {
+            return body.length
+        }
+    }
 }
