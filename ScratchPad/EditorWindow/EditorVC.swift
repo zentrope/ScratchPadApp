@@ -11,7 +11,7 @@ import os.log
 
 fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "EditorViewController")
 
-class EditorVC: NSViewController {
+final class EditorVC: NSViewController {
 
     private let editor = EditorTextView()
 
@@ -89,7 +89,7 @@ extension NSMenu {
 
 extension EditorVC: NSTextViewDelegate {
 
-    @objc func makeNewPageLink(_ sender: NSMenuItem) {
+    @objc private func makeNewPageLink(_ sender: NSMenuItem) {
         let range = editor.textView.selectedRange()
         if let newPage = editor.textView.textStorage?.attributedSubstring(from: range).string {
             Environment.windows.open(name: newPage)
@@ -155,21 +155,17 @@ extension EditorVC: NSTextViewDelegate {
         return false
     }
 
-    func render(_ textView: NSTextView) {
+    private func render(_ textView: NSTextView) {
         guard let source = textView.textStorage else { return }
 
-        // TODO: This will remove legit http links, too. Hm.
-        // Use: func enumerateAttribute(_ attrName: NSAttributedString.Key, in enumerationRange: NSRange, options opts: NSAttributedString.EnumerationOptions = [], using block: (Any?, NSRange, UnsafeMutablePointer<ObjCBool>) -> Void)
-        source.removeAttribute(.link, range: NSMakeRange(0, source.length))
-        for title in Environment.database.names {
-            let link = Environment.windows.makeLink(title)
-            do {
-                try source.addLink(word: title, link: link)
-            }
+        source.removeLinks(scheme: "scratchpad")
 
-            catch {
-                os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
-            }
+        do {
+            try source.addLink(scheme: Windows.linkSchema, words: Environment.database.names)
+        }
+
+        catch {
+            os_log("%{public}s", log: logger, type: .error, error.localizedDescription)
         }
     }
 
