@@ -50,7 +50,7 @@ extension NSMutableAttributedString {
 
     func addLink(scheme: String, words: [String]) throws {
         for word in words {
-            try addLink(word: word, link: "\(scheme)://\(word)")
+            try addLink(word: word, link: "\(scheme)\(word)")
         }
     }
 
