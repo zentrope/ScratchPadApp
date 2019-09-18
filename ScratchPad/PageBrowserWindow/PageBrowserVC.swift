@@ -7,6 +7,9 @@
 //
 
 import Cocoa
+import os.log
+
+fileprivate let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "PageBrowserVC")
 
 fileprivate enum ColumnId: String, CaseIterable {
     case name = "Name"
@@ -34,7 +37,7 @@ fileprivate enum ColumnId: String, CaseIterable {
     }
 }
 
-class PageBrowserVC: NSViewController {
+final class PageBrowserVC: NSViewController {
 
     private var scrollView = NSScrollView()
     private var tableView = NSTableView()
@@ -100,9 +103,28 @@ class PageBrowserVC: NSViewController {
         }
     }
 
+    private var timer: Timer?
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        os_log("%{public}s", log: logger, "Creating relative-timestamp timer.")
+        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] _ in
+            self?.updateRelativeTimestamps()
+        })
+    }
+
     override func viewWillDisappear() {
         super.viewWillDisappear()
+        os_log("%{public}s", log: logger, "Invalidating relative-timestamp timer.")
+        timer?.invalidate()
         NotificationCenter.default.removeObserver(changeObserver)
+    }
+
+    private func updateRelativeTimestamps() {
+        pages.enumerated().forEach { (offset, page) in
+            tableView.reloadData(forRowIndexes: [offset], columnIndexes: [1, 2])
+        }
     }
 
     private func reload(packet: DataUpdatePacket) {
@@ -220,8 +242,8 @@ extension PageBrowserVC: NSTableViewDelegate {
 
         switch column {
         case .name: cell.set(page.name)
-        case .created: cell.set(page.dateCreated.dateAndTime)
-        case .updated: cell.set(page.dateUpdated.dateAndTime)
+        case .created: cell.set(page.dateCreated.relativeDescription())
+        case .updated: cell.set(page.dateUpdated.relativeDescription())
         case .size: cell.set(page.size)
         case .snippet: cell.set(page.snippet)
         }
@@ -246,7 +268,7 @@ extension PageBrowserVC: NSTableViewDataSource {
 
 // MARK: - Cell
 
-class Cell: NSView {
+final class Cell: NSView {
 
     enum Kind {
         case string, integer

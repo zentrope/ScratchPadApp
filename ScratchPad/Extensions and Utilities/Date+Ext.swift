@@ -19,4 +19,34 @@ extension Date {
     var dateAndTime: String {
         return Date.shortFormatter.string(from: self)
     }
+
+    func relativeDescription() -> String {
+        let seconds: Double = 60;
+        let minutes: Double = 60 * 60
+        let hours: Double = 24 * 60 * 60
+        let days: Double = 3 * 24 * 60 * 60
+
+        let duration = DateInterval(start: self, end: Date()).duration
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+
+        let doplerFormatter = DateComponentsFormatter()
+        doplerFormatter.unitsStyle = .abbreviated
+
+        switch duration {
+        case 0..<seconds:
+            doplerFormatter.allowedUnits = [.second]
+        case 60..<minutes:
+            doplerFormatter.allowedUnits = [.minute]
+        case 0..<hours:
+            doplerFormatter.allowedUnits = [.hour]
+        case 0..<days:
+            doplerFormatter.allowedUnits = [.day]
+        default:
+            return dateFormatter.string(from: self)
+        }
+        return doplerFormatter.string(from: duration) ?? dateFormatter.string(from: self)
+    }
+
 }
